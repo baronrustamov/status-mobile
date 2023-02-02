@@ -1,19 +1,20 @@
 (ns status-im2.contexts.communities.discover.view
-  (:require [utils.i18n :as i18n]
-            [oops.core :as oops] ;; TODO move to status-im2
+  (:require [oops.core :as oops] ;; TODO move to status-im2
             [quo2.core :as quo]
             [quo2.foundations.colors :as colors]
             [react-native.core :as rn]
+            [react-native.platform :as platform]
             [react-native.blur :as blur]
             [reagent.core :as reagent]
-            [status-im.react-native.resources :as resources]
-            [status-im2.contexts.communities.menus.community-options.view :as options]
-            [status-im.ui.screens.communities.community :as community]
             [status-im.ui.components.react :as react]
-            [react-native.platform :as platform]
+            [status-im.react-native.resources :as resources]
+            [status-im.ui.screens.communities.community :as community]
             [status-im2.common.scroll-page.view :as scroll-page]
             [status-im2.contexts.communities.discover.style :as style]
-            [utils.re-frame :as rf]))
+            [status-im2.contexts.communities.discover.featured-info-sheet :as featured-info-sheet]
+            [status-im2.contexts.communities.menus.community-options.view :as options]
+            [utils.re-frame :as rf]
+            [utils.i18n :as i18n]))
 
 (def mock-community-item-data  ;; TODO: remove once communities are loaded with this data.
   {:data {:community-color "#0052FF"
@@ -73,14 +74,18 @@
       :style               {:margin-right 6}}
      (i18n/label :t/featured)]
     [quo/counter {:type :grey} communities-count]]
-   [quo/icon :i/info
-    {:container-style {:align-items     :center
-                       :justify-content :center}
-     :resize-mode     :center
-     :size            20
-     :color           (colors/theme-colors
-                       colors/neutral-50
-                       colors/neutral-40)}]])
+   [rn/touchable-without-feedback
+    {:on-press        (rf/dispatch [:bottom-sheet/show-sheet
+                                     {:content (fn []
+                                                 [featured-info-sheet/sheet-info])}])}
+    [quo/icon :i/info
+     {:container-style {:align-items     :center
+                        :justify-content :center}
+      :resize-mode     :center
+      :size            20
+      :color           (colors/theme-colors
+                        colors/neutral-50
+                        colors/neutral-40)}]]])
 
 (defn discover-communities-segments
   [selected-tab fixed]
@@ -108,8 +113,8 @@
       [rn/view
        {:style     style/featured-list-container
         :on-layout #(swap! view-size
-                      (fn []
-                        (- (oops/oget % "nativeEvent.layout.width") 20)))}
+                           (fn []
+                             (- (oops/oget % "nativeEvent.layout.width") 20)))}
        (when-not (= @view-size 0)
          [rn/flat-list
           {:key-fn                            :id

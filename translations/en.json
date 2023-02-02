@@ -1113,6 +1113,7 @@
     "quiet-hours": "{{quiet-hours}} hours",
     "re-encrypt-key": "Re-encrypt your keys",
     "receive": "Receive",
+    "read-more": "Read more",
     "receive-transaction": "Receive transaction",
     "recent": "Recent",
     "recent-recipients": "Contacts",
