@@ -36,16 +36,43 @@
     (i18n/label :t/share)]])
 
 (defn profile-tab [window-width]
-      (let [multiaccount   (rf/sub [:multiaccount/accounts])
-            public-key     (multiaccount :public-key)
-            emoji-hash     (:emoji-hash multiaccount) ;;; TODO(siddarthay) : when multiaccount is created
+      (let [multiaccounts    (rf/sub [:multiaccount/accounts])
+            multiaccount     (rf/sub [:multiaccount])
+            keyuid           (get multiaccount :key-uid)
+            current-pk       (rf/sub [:multiaccount/public-key])
+            port             (rf/sub [:mediaserver/port])
+            emoji-hash       "🙈🤭🤓😂🤷🏻😈😇🤑🥳😍🥺"
+            profile-qr-url   (str "https://join.status.im/u/"  current-pk)
+            media-server-url (str "https://localhost:"
+                                  port
+                                  "/GenerateQRCode?qrurl="
+                                  (js/btoa profile-qr-url)
+                                  "&keyUid="
+                                  keyuid
+                                  "&imageName=thumbnail")
+;            public-key     (multiaccount :public-key)
+            ;;emoji-hash     (:emoji-hash multiaccount) ;;; TODO(siddarthay) : when multiaccount is created
                                                       ;;; make call back to native module statusgo and fetch
                                                       ;;; the emoji hash from and then store it in app-db
-            profile-qr-url (str "https://join.status.im/u/"  public-key)
+
             ]
       [:<>
        [rn/view {:style (style/qr-code-container window-width)}
-        [qr-code-viewer/qr-code-view (* window-width 0.808) profile-qr-url 12 colors/white]
+        ;;; todo now qr-code-viewer can be replaced with either a fast-image or a
+        ;;; react-native image component and we could directly call the media server
+;        [qr-code-viewer/qr-code-view (* window-width 0.808) profile-qr-url 12 colors/white]
+        [rn/view {:style {:flex-direction :row
+                          :justify-content :center}}
+            [rn/image {:source {:uri           media-server-url}
+                       :style  {:width         303
+                                :height        303
+                                :margin-top    30
+                                :border-radius 4
+                                :margin-right  4}}
+             ]
+         ]
+
+
         [rn/view {:style style/profile-address-container}
          [rn/view {:style style/profile-address-column}
           [quo/text
@@ -61,12 +88,13 @@
                      :number-of-lines 1}
             profile-qr-url]]]
 
-         [rn/view {:style style/address-share-button-container}
+         [rn/view
           [quo/button
            {:icon                true
             :type                :blur-bg
             :size                32
             :accessibility-label :link-to-profile
+            :override-theme      :dark
             :style               style/header-button
             ;;:on-press           ;;;; TODO(siddarthay) : figure this out and take appropriate action
             }
@@ -84,12 +112,13 @@
            [copyable-text/copyable-text-view {:copied-text emoji-hash :container-style style/copyable-text-container-style}
             [rn/view {:style (style/set-custom-width (* window-width 0.87))}
              [rn/text {:style (style/emoji-hash-content (* window-width 0.72))} emoji-hash]
-             [rn/view {:style style/emoji-share-button-container}
+             [rn/view
               [quo/button
                {:icon                true
                 :type                :blur-bg
                 :size                32
                 :accessibility-label :link-to-profile
+                :override-theme      :dark
                 :style               style/header-button
                 ;;:on-press           ;;;; TODO(siddarthay) : probably do nothing here? idk
                 }
@@ -107,7 +136,7 @@
   )
 
 (defn view []
-  (let [selected-tab (reagent/atom :recent)]
+  (let [selected-tab (reagent/atom profile-tab-id)]
      [safe-area/consumer
       (fn [{:keys [top bottom]}]
         (let [window-width  (rf/sub [:dimensions/window-width])]
@@ -117,7 +146,7 @@
             {:size                28
              :scrollable?         true
              :blur?               true
-             :override-theme      :dark
+             :override-theme      :light
              :style               style/tabs
              :fade-end-percentage 0.79
              :scroll-on-press?    true

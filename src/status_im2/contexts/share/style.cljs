@@ -42,6 +42,7 @@
 
 (def profile-address-label
   {:align-self :flex-start
+   :color colors/white-opa-40
    :padding-horizontal 20
    :padding-top 10})
 
