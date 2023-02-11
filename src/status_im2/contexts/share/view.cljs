@@ -12,6 +12,7 @@
             ;;TODO(siddarthkay) : move these components over to status-im2 ns first
             [status-im.ui.components.qr-code-viewer.views :as qr-code-viewer]
             [status-im.ui.components.copyable-text :as copyable-text]
+            [react-native.fast-image :as fast-image]
             ))
 
 (def ^:const profile-tab-id 0)
@@ -56,6 +57,7 @@
                                                       ;;; the emoji hash from and then store it in app-db
 
             ]
+        (log/info "media-server-url" media-server-url)
       [:<>
        [rn/view {:style (style/qr-code-container window-width)}
         ;;; todo now qr-code-viewer can be replaced with either a fast-image or a
@@ -63,13 +65,17 @@
 ;        [qr-code-viewer/qr-code-view (* window-width 0.808) profile-qr-url 12 colors/white]
         [rn/view {:style {:flex-direction :row
                           :justify-content :center}}
-            [rn/image {:source {:uri           media-server-url}
-                       :style  {:width         303
-                                :height        303
-                                :margin-top    30
-                                :border-radius 4
-                                :margin-right  4}}
-             ]
+         [fast-image/fast-image
+          {:style  {:width  "100%"
+                    :height 300}
+           :source {:uri media-server-url}}]
+;            [rn/image {:source {:uri           media-server-url}
+;                       :style  {:width         303
+;                                :height        303
+;                                :margin-top    30
+;                                :border-radius 4
+;                                :margin-right  4}}
+;             ]
          ]
 
 
