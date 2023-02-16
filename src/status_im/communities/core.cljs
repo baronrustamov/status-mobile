@@ -794,3 +794,24 @@
                                 :community-id community-id
                                 :public-key   public-key
                                 :role-id      role-id})]})
+
+(rf/defn mute-chat-failed
+  {:events [:mute-community-failed]}
+  [{:keys [db]} community-id muted? error]
+  (log/error "mute community failed" community-id error)
+  {:db (assoc-in db [:communities community-id :muted] (not muted?))})
+
+(rf/defn mute-chat-toggled-successfully
+  {:events [:mute-community-successful]}
+  [_ community-id]
+  (log/debug "muted chat successfully" community-id))
+
+
+(rf/defn set-community-muted
+  {:events [:community/set-muted]}
+  [{:keys [db]} community-id muted?]
+  {:db            (assoc-in db [:communities community-id :muted] muted?)
+   :json-rpc/call [{:method     "wakuext_setCommunityMuted"
+                    :params     [community-id muted?]
+                    :on-error   #(rf/dispatch [:mute-community-failed community-id muted? %])
+                    :on-success #(rf/dispatch [:mute-community-successful community-id])}]})
