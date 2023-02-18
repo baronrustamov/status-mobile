@@ -221,7 +221,7 @@
    collapsed-categories
    full-chats-data]
   (fn [acc
-       [_ {:keys [name categoryID position id emoji can-post?]}]]
+       [_ {:keys [name categoryID position id emoji can-post? muted]}]]
     (let [category-id                       (if (seq categoryID) categoryID constants/empty-category-id)
           {:keys [unviewed-messages-count
                   unviewed-mentions-count]} (get full-chats-data
@@ -238,6 +238,7 @@
                                                       :chats      [])))
           chat                              {:name             name
                                              :emoji            emoji
+                                             :muted?           muted
                                              :unread-messages? (pos? unviewed-messages-count)
                                              :position         position
                                              :mentions-count   (or unviewed-mentions-count 0)
@@ -270,6 +271,18 @@
                   [k (update v :chats #(sort-by :position %))])))]
 
      categories-and-chats)))
+
+(re-frame/reg-sub
+ :communities/channel-by-id
+ (fn [[_ {:keys [community-id channel-id]}]]
+   [(re-frame/subscribe [:communities/categorized-channels community-id])
+    (atom channel-id)])
+ (fn [[channels channel-id]]
+   (->> channels
+        vals
+        (apply concat)
+        (filter #(= (:id %) channel-id))
+        first)))
 
 (re-frame/reg-sub
  :communities/users
