@@ -44,8 +44,7 @@
   {:icon                (if muted? :i/muted :i/activity-center)
    :accessibility-label (if muted? :unmute-channel :mute-channel)
    :label               (i18n/label (if muted? :t/unmute-channel :t/mute-channel))
-   #_:sub-label
-   #_(when muted? (str "muted for 15 minutes"))
+   :sub-label           (when muted? (str "muted for 15 minutes"))
    :on-press            (if muted?
                           #(unmute-channel-action id)
                           #(mute-channel-action id))
