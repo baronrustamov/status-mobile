@@ -43,14 +43,17 @@
             current-pk       (rf/sub [:multiaccount/public-key])
             port             (rf/sub [:mediaserver/port])
             emoji-hash       "🙈🤭🤓😂🤷🏻😈😇🤑🥳😍🥺"
+;            emoji-hash       (get multiaccount :key-uid)
             profile-qr-url   (str "https://join.status.im/u/"  current-pk)
             media-server-url (str "https://localhost:"
                                   port
-                                  "/GenerateQRCode?qrurl="
+                                  "/GenerateQRCode?level=2&url="
                                   (js/btoa profile-qr-url)
                                   "&keyUid="
                                   keyuid
-                                  "&imageName=thumbnail")
+                                  "&allowProfileImage=true"
+                                  "&size=200"
+                                  "&imageName=large")
 ;            public-key     (multiaccount :public-key)
             ;;emoji-hash     (:emoji-hash multiaccount) ;;; TODO(siddarthay) : when multiaccount is created
                                                       ;;; make call back to native module statusgo and fetch
@@ -65,17 +68,17 @@
 ;        [qr-code-viewer/qr-code-view (* window-width 0.808) profile-qr-url 12 colors/white]
         [rn/view {:style {:flex-direction :row
                           :justify-content :center}}
-         [fast-image/fast-image
-          {:style  {:width  "100%"
-                    :height 300}
-           :source {:uri media-server-url}}]
-;            [rn/image {:source {:uri           media-server-url}
-;                       :style  {:width         303
-;                                :height        303
-;                                :margin-top    30
-;                                :border-radius 4
-;                                :margin-right  4}}
-;             ]
+;         [fast-image/fast-image
+;          {:style  {:width  "100%"
+;                    :height 300}
+;           :source {:uri media-server-url}}]
+            [rn/image {:source {:uri           media-server-url}
+                       :style  {:width         303
+                                :height        303
+                                :margin-top    30
+                                :border-radius 4
+                                :margin-right  4}}
+             ]
          ]
 
 
