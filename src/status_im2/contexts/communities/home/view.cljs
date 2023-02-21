@@ -22,24 +22,28 @@
                       {:id :pending :label (i18n/label :t/pending) :accessibility-label :pending-tab}
                       {:id :opened :label (i18n/label :t/opened) :accessibility-label :opened-tab}]}]])
 
+(defn community-list-item
+  [id]
+  (let [community (rf/sub [:communities/home-item id])]
+    [quo/communities-membership-list-item
+     {:on-press      #(rf/dispatch [:navigate-to-nav2 :community-overview id])
+      :on-long-press #(rf/dispatch
+                       [:bottom-sheet/show-sheet
+                        {:content       (fn []
+                                          [options/community-options-bottom-sheet id])
+                         :selected-item (fn []
+                                          [quo/communities-membership-list-item {} community])}])}
+     community]))
+
 (defn communities-list
   [communities-ids]
-  [rn/view
-   (map-indexed
-    (fn [index id]
-      (let [community (rf/sub [:communities/home-item id])]
-        ^{:key index}
-        [quo/communities-membership-list-item
-         {:on-press      #(rf/dispatch [:navigate-to-nav2 :community-overview id])
-          :on-long-press #(rf/dispatch
-                           [:bottom-sheet/show-sheet
-                            {:content       (fn []
-                                              [options/community-options-bottom-sheet id])
-                             :selected-item (fn []
-                                              [quo/communities-membership-list-item {} community])}])}
-         community]))
-    communities-ids)])
-
+  [rn/flat-list
+   {:key-fn                            :id
+    :keyboard-should-persist-taps      :always
+    :shows-horizontal-scroll-indicator false
+    :separator                         [rn/view {:width 12}]
+    :data                              communities-ids
+    :render-fn                         community-list-item}])
 
 (defn render-communities-segments
   [selected-tab]
