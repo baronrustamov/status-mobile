@@ -181,9 +181,10 @@
                  :gates                    tokens}}]])
 
 (defn add-handlers
-  [community-id {:keys [name emoji id locked? token-gating]
-                 :or   {locked? false}
-                 :as   chat}]
+  [community-id
+   {:keys [name emoji id locked? token-gating]
+    :or   {locked? false}
+    :as   chat}]
   (merge
    chat
    (if (and locked? token-gating)
@@ -199,15 +200,15 @@
       :community-id  community-id}
 
      (when (and (not locked?) id)
-       {:on-press     (fn []
-                        (rf/dispatch [:dismiss-keyboard])
-                        (rf/dispatch [:chat/navigate-to-chat (str community-id id)])
-                        (rf/dispatch [:search/home-filter-changed nil]))
+       {:on-press      (fn []
+                         (rf/dispatch [:dismiss-keyboard])
+                         (rf/dispatch [:chat/navigate-to-chat (str community-id id)])
+                         (rf/dispatch [:search/home-filter-changed nil]))
         :on-long-press #(rf/dispatch
                          [:bottom-sheet/show-sheet
                           {:content (fn []
                                       [channel-options/channel-options-bottom-sheet community-id id])}])
-        :community-id community-id}))))
+        :community-id  community-id}))))
 
 (defn add-handlers-to-chats
   [community-id chats]

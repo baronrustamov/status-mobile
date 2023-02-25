@@ -292,7 +292,7 @@
 (rf/defn mute-chat-toggled-successfully
   {:events [:chat/mute-successfully]}
   [_ chat-id]
-  (log/debug "muted chat successfully" chat-id))
+  (log/debug "muted chat toggled successfully" chat-id))
 
 (rf/defn mute-chat
   {:events [:chat.ui/mute]}

@@ -12,8 +12,9 @@
   [{:keys [name locked? mentions-count unread-messages?
            muted? is-active-channel? emoji channel-color on-press on-long-press]
     :or   {channel-color colors/primary-50}}]
-  [rn/touchable-opacity {:on-press      on-press
-                         :on-long-press on-long-press}
+  [rn/touchable-opacity
+   {:on-press      on-press
+    :on-long-press on-long-press}
    [rn/view
     {:style (merge {:height          48
                     :display         :flex

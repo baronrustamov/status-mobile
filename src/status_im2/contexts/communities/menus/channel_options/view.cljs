@@ -44,7 +44,8 @@
   {:icon                (if muted? :i/muted :i/activity-center)
    :accessibility-label (if muted? :unmute-channel :mute-channel)
    :label               (i18n/label (if muted? :t/unmute-channel :t/mute-channel))
-   :sub-label           (when muted? (str "muted for 15 minutes"))
+   #_:sub-label
+   #_(when muted? (str "muted for 15 minutes"))
    :on-press            (if muted?
                           #(unmute-channel-action id)
                           #(mute-channel-action id))
@@ -83,7 +84,8 @@
    :label               (i18n/label :t/share-channel)
    :on-press            #()})
 
-(defn notifications []
+(defn notifications
+  []
   {:icon                :i/notifications
    :label               (i18n/label :t/notifications)
    :on-press            #(js/alert "TODO: to be implemented, requires design input")
