@@ -1,10 +1,14 @@
 (ns status-im2.contexts.chat.messages.list.view
   (:require [oops.core :as oops]
             [quo2.core :as quo]
+            [react-native.safe-area :as safe-area]
             [react-native.background-timer :as background-timer]
             [react-native.core :as rn]
             [react-native.platform :as platform]
             [reagent.core :as reagent]
+            [quo2.foundations.colors :as colors]
+            [quo2.components.avatars.user-avatar :as user-avatar]
+            [react-native.reanimated :as reanimated]
             [status-im.ui.screens.chat.group :as chat.group]
             [status-im.ui.screens.chat.message.gap :as message.gap]
             [status-im2.common.not-implemented :as not-implemented]
@@ -12,8 +16,10 @@
             [status-im2.contexts.chat.messages.content.deleted.view :as content.deleted]
             [status-im2.contexts.chat.messages.content.view :as message]
             [status-im2.contexts.chat.messages.list.state :as state]
+            [status-im2.contexts.chat.messages.list.style :as style]
             [utils.i18n :as i18n]
-            [utils.re-frame :as rf]))
+            [utils.re-frame :as rf]
+            [status-im.ui.components.fast-image :as fast-image]))
 
 (defonce messages-list-ref (atom nil))
 
@@ -30,10 +36,10 @@
 
 (defn on-scroll
   [evt]
-  (let [y                  (oops/oget evt "nativeEvent.contentOffset.y")
-        layout-height      (oops/oget evt "nativeEvent.layoutMeasurement.height")
-        threshold-height   (* (/ layout-height 100)
-                              threshold-percentage-to-show-floating-scroll-down-button)
+  (let [y (oops/oget evt "nativeEvent.contentOffset.y")
+        layout-height (oops/oget evt "nativeEvent.layoutMeasurement.height")
+        threshold-height (* (/ layout-height 100)
+                            threshold-percentage-to-show-floating-scroll-down-button)
         reached-threshold? (> y threshold-height)]
     (when (not= reached-threshold? @show-floating-scroll-down-button)
       (rn/configure-next (:ease-in-ease-out rn/layout-animation-presets))
@@ -43,17 +49,17 @@
   [evt]
   (when @messages-list-ref
     (reset! state/first-not-visible-item
-      (when-let [last-visible-element (aget (oops/oget evt "viewableItems")
-                                            (dec (oops/oget evt "viewableItems.length")))]
-        (let [index             (oops/oget last-visible-element "index")
-              ;; Get first not visible element, if it's a datemark/gap
-              ;; we might unnecessarely add messages on receiving as
-              ;; they do not have a clock value, but most of the times
-              ;; it will be a message
-              first-not-visible (aget (oops/oget @messages-list-ref "props.data") (inc index))]
-          (when (and first-not-visible
-                     (= :message (:type first-not-visible)))
-            first-not-visible))))))
+            (when-let [last-visible-element (aget (oops/oget evt "viewableItems")
+                                                  (dec (oops/oget evt "viewableItems.length")))]
+              (let [index (oops/oget last-visible-element "index")
+                    ;; Get first not visible element, if it's a datemark/gap
+                    ;; we might unnecessarely add messages on receiving as
+                    ;; they do not have a clock value, but most of the times
+                    ;; it will be a message
+                    first-not-visible (aget (oops/oget @messages-list-ref "props.data") (inc index))]
+                (when (and first-not-visible
+                           (= :message (:type first-not-visible)))
+                  first-not-visible))))))
 
 ;;TODO this is not really working in pair with inserting new messages because we stop inserting new
 ;;messages
@@ -106,12 +112,52 @@
   (reset! messages-view-height (oops/oget evt "nativeEvent.layout.height")))
 
 (defn list-footer
-  [{:keys [chat-id]}]
-  (let [loading-messages? (rf/sub [:chats/loading-messages? chat-id])
-        all-loaded?       (rf/sub [:chats/all-loaded? chat-id])]
-    (when (or loading-messages? (not chat-id) (not all-loaded?))
-      [rn/view {:style (when platform/android? {:scaleY -1})}
-       [quo/skeleton @messages-view-height]])))
+  [{:keys [chat insets scroll-y cover-bg-color cover-uri]}]
+  (let [{:keys [chat-id chat-name emoji chat-type group-chat]} chat
+        display-name (if (= chat-type constants/one-to-one-chat-type)
+                       (first (rf/sub [:contacts/contact-two-names-by-identity chat-id]))
+                       (str emoji " " chat-name))
+        loading-messages? (rf/sub [:chats/loading-messages? chat-id])
+        all-loaded? (rf/sub [:chats/all-loaded? chat-id])
+        online? (rf/sub [:visibility-status-updates/online? chat-id])
+        contact (when-not group-chat (rf/sub [:contacts/contact-by-address chat-id]))
+        photo-path (when-not (empty? (:images contact)) (rf/sub [:chats/photo-path chat-id]))]
+    [:f>
+     (fn []
+       (let [border-animation (reanimated/interpolate scroll-y [50 100] [14 0]
+                                                      {:extrapolateLeft  "clamp"
+                                                       :extrapolateRight "clamp"})]
+         [:<>
+          [rn/view
+           {:style {:background-color (colors/theme-colors colors/white colors/neutral-95)
+                    :top              (- 0 (- (:bottom insets) 16))}}
+           (when cover-uri
+             [fast-image/fast-image
+              {:style  {:width  "100%"
+                        :height style/cover-height}
+               :source {:uri cover-uri}}])
+           (when cover-bg-color
+             [rn/view
+              {:style {:width            "100%"
+                       :height           style/cover-height
+                       :background-color cover-bg-color}}])
+           [reanimated/view {:style (style/header-bottom-part border-animation)}
+            [rn/view {:style style/header-avatar}
+             [user-avatar/user-avatar {:full-name       display-name
+                                       :online?         online?
+                                       :profile-picture photo-path
+                                       :size            :big}]
+             [quo/text
+              {:weight          :semi-bold
+               :size            :heading-1
+               :style           {:margin-top 12}
+               :number-of-lines 1}
+              display-name]
+             [quo/text {:style {:margin-top 8}}
+              "Web 3.0 Designer @ethstatus • DJ • Producer • Dad • YouTuber."]]]]
+          (when (or loading-messages? (not chat-id) (not all-loaded?))
+            [rn/view {:style (when platform/android? {:scaleY -1})}
+             [quo/skeleton @messages-view-height]])]))]))
 
 (defn list-header
   [{:keys [chat-id chat-type invitation-admin]}]
@@ -132,57 +178,92 @@
           [content.deleted/deleted-message message-data context]
           [message/message-with-reactions message-data context])]))])
 
+(defn scroll-handler
+  [event initial-y scroll-y]
+  (let [content-size-y (- (oops/oget event "nativeEvent.contentSize.height")
+                          (oops/oget event "nativeEvent.layoutMeasurement.height"))
+        current-y (+ (oops/oget event "nativeEvent.contentOffset.y") initial-y)]
+    (reanimated/set-shared-value scroll-y (- content-size-y current-y))))
+
 (defn messages-list
-  [{:keys [chat
-           pan-responder
-           show-input?]}]
+  [{:keys [chat show-input? cover-bg-color header-comp footer-comp]}]
   (let [{:keys [group-chat chat-id public? community-id admins]} chat
-        messages                                                 (rf/sub [:chats/raw-chat-messages-stream
-                                                                          chat-id])
-        bottom-space                                             15]
-    [rn/view
-     {:style {:flex 1}}
-     ;;DO NOT use anonymous functions for handlers
-     [rn/flat-list
-      (merge
-       pan-responder
-       {:key-fn                       list-key-fn
-        :ref                          list-ref
-        :header                       [list-header chat]
-        :footer                       [list-footer chat]
-        :data                         messages
-        :render-data                  (get-render-data {:group-chat      group-chat
-                                                        :chat-id         chat-id
-                                                        :public?         public?
-                                                        :community-id    community-id
-                                                        :admins          admins
-                                                        :show-input?     show-input?
-                                                        :edit-enabled    true
-                                                        :in-pinned-view? false})
-        :render-fn                    render-fn
-        :on-viewable-items-changed    on-viewable-items-changed
-        :on-end-reached               list-on-end-reached
-        :on-scroll-to-index-failed    identity            ;;don't remove this
-        :content-container-style      {:padding-top    (+ bottom-space 32)
-                                       :padding-bottom 16}
-        :scroll-indicator-insets      {:top bottom-space} ;;ios only
-        :keyboard-dismiss-mode        :interactive
-        :keyboard-should-persist-taps :handled
-        :onMomentumScrollBegin        state/start-scrolling
-        :onMomentumScrollEnd          state/stop-scrolling
-        :scrollEventThrottle          16
-        :on-scroll                    on-scroll
-        ;;TODO https://github.com/facebook/react-native/issues/30034
-        :inverted                     (when platform/ios? true)
-        :style                        (when platform/android? {:scaleY -1})
-        :on-layout                    on-messages-view-layout})]
-     [quo/floating-shell-button
-      (merge {:jump-to
-              {:on-press #(do
-                            (rf/dispatch [:chat/close true])
-                            (rf/dispatch [:shell/navigate-to-jump-to]))
-               :label    (i18n/label :t/jump-to)}}
-             (when @show-floating-scroll-down-button
-               {:scroll-to-bottom {:on-press scroll-to-bottom}}))
-      {:position :absolute
-       :bottom   6}]]))
+        messages (rf/sub [:chats/raw-chat-messages-stream chat-id])]
+    [safe-area/consumer
+     (fn [insets]
+       (let [window-height (:height (rn/get-window))
+             status-bar-height (rn/status-bar-height)
+             ;; view height calculation is different because window height is different on iOS and Android:
+             view-height       (if platform/ios?
+                                 window-height
+                                 (+ window-height status-bar-height))
+             initial-y (if platform/ios? (- (:top insets)) 0)]
+         [:f>
+          (fn []
+            (let [scroll-y (reanimated/use-shared-value initial-y)]
+              [rn/keyboard-avoiding-view
+               {:style                  {:position :absolute
+                                         :display  :flex
+                                         :flex     1
+                                         :top      0
+                                         :left     0
+                                         :height   view-height
+                                         :right    0}
+                :keyboardVerticalOffset (- (:bottom insets))}
+
+               (when header-comp
+                 [header-comp {:scroll-y scroll-y}])
+
+               [rn/view
+                {:style {:flex 1}}
+                [reanimated/flat-list
+                 {:key-fn                       list-key-fn
+                  :ref                          list-ref
+                  :header                       [list-header chat]
+                  :footer                       [list-footer {:chat           chat
+                                                              :insets         insets
+                                                              :scroll-y       scroll-y
+                                                              :cover-bg-color cover-bg-color}]
+                  :data                         messages
+                  :render-data                  (get-render-data {:group-chat      group-chat
+                                                                  :chat-id         chat-id
+                                                                  :public?         public?
+                                                                  :community-id    community-id
+                                                                  :admins          admins
+                                                                  :show-input?     show-input?
+                                                                  :edit-enabled    true
+                                                                  :in-pinned-view? false})
+                  :render-fn                    render-fn
+                  :on-viewable-items-changed    on-viewable-items-changed
+                  :on-end-reached               list-on-end-reached
+                  :on-scroll-to-index-failed    identity    ;;don't remove this
+                  :scroll-indicator-insets      {:top 16}   ;;ios only
+                  :content-container-style      {:padding-top    16
+                                                 :padding-bottom 16}
+                  :keyboard-dismiss-mode        :interactive
+                  :keyboard-should-persist-taps :handled
+                  :onMomentumScrollBegin        state/start-scrolling
+                  :onMomentumScrollEnd          state/stop-scrolling
+                  :scrollEventThrottle          16
+                  :on-scroll                    (fn [event]
+                                                  (scroll-handler event initial-y scroll-y)
+                                                  (when on-scroll
+                                                    (on-scroll event)))
+                  ;;TODO https://github.com/facebook/react-native/issues/30034
+                  :inverted                     (when platform/ios? true)
+                  :style                        (when platform/android? {:scaleY -1})
+                  :on-layout                    on-messages-view-layout}]
+
+                [quo/floating-shell-button
+                 (merge {:jump-to
+                         {:on-press #(do
+                                       (rf/dispatch [:chat/close true])
+                                       (rf/dispatch [:shell/navigate-to-jump-to]))
+                          :label    (i18n/label :t/jump-to)}}
+                        (when @show-floating-scroll-down-button
+                          {:scroll-to-bottom {:on-press scroll-to-bottom}}))
+                 {:position :absolute
+                  :bottom   6}]]
+
+               (when footer-comp
+                 (footer-comp {:insets insets}))]))]))]))

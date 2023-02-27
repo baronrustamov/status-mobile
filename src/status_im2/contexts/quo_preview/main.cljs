@@ -7,7 +7,6 @@
     [quo2.theme :as theme]
     [re-frame.core :as re-frame]
     [react-native.core :as rn]
-    [status-im2.contexts.quo-preview.animated-header-list.animated-header-list :as animated-header-list]
     [status-im2.contexts.quo-preview.avatars.account-avatar :as account-avatar]
     [status-im2.contexts.quo-preview.avatars.channel-avatar :as channel-avatar]
     [status-im2.contexts.quo-preview.avatars.group-avatar :as group-avatar]
@@ -82,9 +81,6 @@
   {:foundations           [{:name      :shadows
                             :insets    {:top false}
                             :component shadows/preview-shadows}]
-   :animated-list         [{:name      :animated-header-list
-                            :options   {:topBar {:visible false}}
-                            :component animated-header-list/mock-screen}]
    :avatar                [{:name      :group-avatar
                             :insets    {:top false}
                             :component group-avatar/preview-group-avatar}
