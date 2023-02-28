@@ -90,7 +90,7 @@
    :label               (i18n/label :t/notifications)
    :on-press            #(js/alert "TODO: to be implemented, requires design input")
    :danger?             false
-   :sub-label           "All messages" ; TODO: placeholder
+   :sub-label           "All messages"
    :accessibility-label :manage-notifications
    :right-icon          :i/chevron-right
    :chevron?            true
