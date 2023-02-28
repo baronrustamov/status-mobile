@@ -96,7 +96,7 @@
    :chevron?            true
    :add-divider?        false})
 
-(defn channel-opts
+(defn channel-options
   [community-id id token-gated? muted?]
   [[(view-members id)
     (when token-gated? (view-token-gating id))
@@ -108,14 +108,9 @@
     (show-qr id)
     (share-channel id)]])
 
-(defn get-context-drawers
-  [{:keys [id community-id]}]
-  (let [{:keys [token-gated?]} (rf/sub [:communities/community id])
-        {:keys [muted]}        (rf/sub [:chat-by-id (str community-id id)])]
-    (channel-opts community-id id token-gated? muted)))
-
 (defn channel-options-bottom-sheet
   [community-id id]
-  [quo/action-drawer
-   (get-context-drawers {:id           id
-                         :community-id community-id})])
+  (let [{:keys [token-gated?]} (rf/sub [:communities/community id])
+        {:keys [muted]}        (rf/sub [:chat-by-id (str community-id id)])]
+    [quo/action-drawer
+     (channel-options community-id id token-gated? muted)]))

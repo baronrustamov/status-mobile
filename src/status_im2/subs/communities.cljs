@@ -274,14 +274,13 @@
 
 (re-frame/reg-sub
  :communities/channel-by-id
- (fn [[_ {:keys [community-id channel-id]}]]
-   [(re-frame/subscribe [:communities/categorized-channels community-id])
-    (atom channel-id)])
- (fn [[channels channel-id]]
+ (fn [[_ {:keys [community-id]}]]
+   [(re-frame/subscribe [:communities/categorized-channels community-id])])
+ (fn [channels _ [{:keys [channel-id]}]]
    (->> channels
         vals
         (apply concat)
-        (filter #(= (:id %) channel-id))
+        (some #(when (= (:id %) channel-id) %))
         first)))
 
 (re-frame/reg-sub
