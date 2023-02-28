@@ -280,8 +280,7 @@
    (->> channels
         vals
         (apply concat)
-        (some #(when (= (:id %) channel-id) %))
-        first)))
+        (some #(when (= (:id %) channel-id) %)))))
 
 (re-frame/reg-sub
  :communities/users
