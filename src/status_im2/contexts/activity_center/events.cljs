@@ -499,11 +499,15 @@
                      accepted
                      (not dismissed))
                 (toasts/upsert cofx
-                               {:icon       :placeholder
-                                :icon-color colors/primary-50-opa-40
+                               {:user {:full-name         name
+                                       :profile-picture   (:identicon message)
+                                       :status-indicator? true
+                                       :online?           nil
+                                       :size              :small
+                                       :ring?             false}
+                                :icon-color colors/success-50-opa-40
                                 :title      (i18n/label :t/contact-request-accepted-toast
-                                                        {:name (:alias message)})})
-
+                                                        {:name name})})
                 :else
                 cofx))
             {:db db}
