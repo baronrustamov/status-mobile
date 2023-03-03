@@ -16,12 +16,13 @@
             [status-im2.contexts.onboarding.create-password.view :as create-password]
             [status-im2.contexts.onboarding.create-profile.view :as create-profile]
             [status-im2.contexts.onboarding.enable-biometrics.view :as enable-biometrics]
-            [status-im2.contexts.onboarding.enable-notifications.view :as enable-notifications]
             [status-im2.contexts.onboarding.new-to-status.view :as new-to-status]
             [status-im2.contexts.onboarding.profiles.view :as profiles]
             [status-im2.contexts.quo-preview.main :as quo.preview]
             [status-im2.contexts.shell.view :as shell]
-            [status-im2.contexts.syncing.view :as settings-syncing]))
+            [status-im2.contexts.syncing.view :as settings-syncing]
+            [status-im2.contexts.onboarding.enable-notifications.view :as enable-notifications]
+            [status-im2.contexts.welcome.welcome :as welcome]))
 
 (def components
   [])
@@ -148,7 +149,10 @@
                  :topBar        {:visible false}
                  :navigationBar {:backgroundColor colors/black}}
      :insets    {:top false}
-     :component enable-notifications/enable-notifications}]
+     :component enable-notifications/enable-notifications}] 
+
+   {:name      :welcome
+    :component welcome/views}
 
    (when config/quo-preview-enabled?
      quo.preview/screens)

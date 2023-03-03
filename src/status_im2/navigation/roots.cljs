@@ -161,4 +161,12 @@
                                             :id      :profiles
                                             :options (merge
                                                       (status-bar-options)
-                                                      {:topBar {:visible false}})}}]}}}}))
+                                                      {:topBar {:visible false}})}}]}}}}
+         {:notifications-onboarding
+          {:root {:stack {:id       :notifications-onboarding
+                          :children [{:component {:name    :notifications-onboarding
+                                                  :id      :notifications-onboarding
+                                                  :options (status-bar-options)}}]
+                          :options  (merge (default-root)
+                                           (status-bar-options)
+                                           {:topBar (assoc (topbar-options) :visible false)})}}}}))
