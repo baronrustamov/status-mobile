@@ -163,9 +163,17 @@
                                                       (status-bar-options)
                                                       {:topBar {:visible false}})}}]}}}}
          {:notifications-onboarding
-          {:root {:stack {:id       :notifications-onboarding
-                          :children [{:component {:name    :notifications-onboarding
-                                                  :id      :notifications-onboarding
+          {:root
+           {:stack {:id       :notifications-onboarding
+                    :children [{:component {:name    :notifications-onboarding
+                                            :id      :notifications-onboarding
+                                            :options {:statusBar (merge
+                                                                  (status-bar-options)
+                                                                  {:style :light})
+                                                      :topBar (assoc (topbar-options) :visible false)}}}]}}}}
+         {:welcome-new
+          {:root {:stack {:children [{:component {:name    :welcome
+                                                  :id      :welcome
                                                   :options (status-bar-options)}}]
                           :options  (merge (default-root)
                                            (status-bar-options)

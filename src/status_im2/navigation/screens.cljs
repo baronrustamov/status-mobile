@@ -149,10 +149,11 @@
                  :topBar        {:visible false}
                  :navigationBar {:backgroundColor colors/black}}
      :insets    {:top false}
-     :component enable-notifications/enable-notifications}] 
+     :component enable-notifications/enable-notifications} 
 
-   {:name      :welcome
-    :component welcome/views}
+    {:name      :welcome
+     :insets    {:top false}
+     :component welcome/views}]
 
    (when config/quo-preview-enabled?
      quo.preview/screens)
