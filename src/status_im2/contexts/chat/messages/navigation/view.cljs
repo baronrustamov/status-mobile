@@ -11,8 +11,10 @@
             [status-im2.constants :as constants]
             [utils.re-frame :as rf]))
 
-(defn navigation-view [{:keys [scroll-y]}]
-  (let [{:keys [group-chat chat-id chat-name emoji chat-type]} (rf/sub [:chats/current-chat-chat-view])
+(defn navigation-view
+  [{:keys [scroll-y]}]
+  (let [{:keys [group-chat chat-id chat-name emoji
+                chat-type]} (rf/sub [:chats/current-chat-chat-view])
         display-name        (if (= chat-type constants/one-to-one-chat-type)
                               (first (rf/sub [:contacts/contact-two-names-by-identity chat-id]))
                               (str emoji " " chat-name))
@@ -22,22 +24,26 @@
     (fn []
       [:f>
        (fn []
-         (let [opacity-animation (reanimated/interpolate scroll-y
-                                                         [50 100]
-                                                         [0 1]
-                                                         {:extrapolateLeft  "clamp"
-                                                          :extrapolateRight "extend"})
+         (let [opacity-animation        (reanimated/interpolate scroll-y
+                                                                [50 100]
+                                                                [0 1]
+                                                                {:extrapolateLeft  "clamp"
+                                                                 :extrapolateRight "extend"})
                banner-opacity-animation (reanimated/interpolate scroll-y
-                                                         [180 220]
-                                                         [0 1]
-                                                         {:extrapolateLeft  "clamp"
-                                                          :extrapolateRight "clamp"})
-               translate-animation (reanimated/interpolate scroll-y [100 150] [50 0]
-                                                           {:extrapolateLeft  "clamp"
-                                                            :extrapolateRight "clamp"})
-               title-opacity-animation (reanimated/interpolate scroll-y [100 150] [0 1]
-                                                               {:extrapolateLeft  "clamp"
-                                                                :extrapolateRight "clamp"})]
+                                                                [180 220]
+                                                                [0 1]
+                                                                {:extrapolateLeft  "clamp"
+                                                                 :extrapolateRight "clamp"})
+               translate-animation      (reanimated/interpolate scroll-y
+                                                                [100 150]
+                                                                [50 0]
+                                                                {:extrapolateLeft  "clamp"
+                                                                 :extrapolateRight "clamp"})
+               title-opacity-animation  (reanimated/interpolate scroll-y
+                                                                [100 150]
+                                                                [0 1]
+                                                                {:extrapolateLeft  "clamp"
+                                                                 :extrapolateRight "clamp"})]
            [rn/view {:style style/navigation-view}
             [reanimated/blur-view
              {:blurAmount   32
@@ -51,16 +57,19 @@
                {:active-opacity 1
                 :on-press       #(rf/dispatch [:navigate-back])
                 :style          (style/button-container {:margin-left 20})}
-               [quo/icon :i/arrow-left {:size 20 :color (colors/theme-colors colors/black colors/white)}]]
+               [quo/icon :i/arrow-left
+                {:size 20 :color (colors/theme-colors colors/black colors/white)}]]
               [reanimated/view {:style (style/header translate-animation title-opacity-animation)}
                [rn/view {:style style/header-text-container}
-                [user-avatar/user-avatar {:full-name       display-name
-                                          :online?         online?
-                                          :profile-picture photo-path
-                                          :size            :small}]
-                [quo/text {:weight          :semi-bold
-                           :number-of-lines 1
-                           :style           style/header-display-name}
+                [user-avatar/user-avatar
+                 {:full-name       display-name
+                  :online?         online?
+                  :profile-picture photo-path
+                  :size            :small}]
+                [quo/text
+                 {:weight          :semi-bold
+                  :number-of-lines 1
+                  :style           style/header-display-name}
                  display-name]]]
               [rn/touchable-opacity
                {:active-opacity 1

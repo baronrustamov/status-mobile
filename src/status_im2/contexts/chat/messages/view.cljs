@@ -6,7 +6,8 @@
             [status-im2.contexts.chat.messages.composer.view :as composer]
             [status-im2.contexts.chat.messages.list.view :as messages.list]
             [status-im2.contexts.chat.messages.navigation.view :as messages.navigation]
-            [status-im2.contexts.chat.messages.contact-requests.bottom-drawer :as contact-requests.bottom-drawer]
+            [status-im2.contexts.chat.messages.contact-requests.bottom-drawer :as
+             contact-requests.bottom-drawer]
             [status-im2.navigation.state :as navigation.state]
             [utils.re-frame :as rf]))
 
@@ -22,7 +23,9 @@
 
 (defn chat-render
   []
-  (let [{:keys [contact-request-state show-input? group-chat chat-id] :as chat} (rf/sub [:chats/current-chat-chat-view])]
+  (let [{:keys [contact-request-state show-input?
+                group-chat chat-id]
+         :as   chat} (rf/sub [:chats/current-chat-chat-view])]
     [messages.list/messages-list
      {:cover-bg-color style/cover-bg-color
       :chat           chat

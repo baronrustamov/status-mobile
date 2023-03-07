@@ -36,10 +36,10 @@
 
 (defn on-scroll
   [evt]
-  (let [y (oops/oget evt "nativeEvent.contentOffset.y")
-        layout-height (oops/oget evt "nativeEvent.layoutMeasurement.height")
-        threshold-height (* (/ layout-height 100)
-                            threshold-percentage-to-show-floating-scroll-down-button)
+  (let [y                  (oops/oget evt "nativeEvent.contentOffset.y")
+        layout-height      (oops/oget evt "nativeEvent.layoutMeasurement.height")
+        threshold-height   (* (/ layout-height 100)
+                              threshold-percentage-to-show-floating-scroll-down-button)
         reached-threshold? (> y threshold-height)]
     (when (not= reached-threshold? @show-floating-scroll-down-button)
       (rn/configure-next (:ease-in-ease-out rn/layout-animation-presets))
@@ -49,17 +49,17 @@
   [evt]
   (when @messages-list-ref
     (reset! state/first-not-visible-item
-            (when-let [last-visible-element (aget (oops/oget evt "viewableItems")
-                                                  (dec (oops/oget evt "viewableItems.length")))]
-              (let [index (oops/oget last-visible-element "index")
-                    ;; Get first not visible element, if it's a datemark/gap
-                    ;; we might unnecessarely add messages on receiving as
-                    ;; they do not have a clock value, but most of the times
-                    ;; it will be a message
-                    first-not-visible (aget (oops/oget @messages-list-ref "props.data") (inc index))]
-                (when (and first-not-visible
-                           (= :message (:type first-not-visible)))
-                  first-not-visible))))))
+      (when-let [last-visible-element (aget (oops/oget evt "viewableItems")
+                                            (dec (oops/oget evt "viewableItems.length")))]
+        (let [index             (oops/oget last-visible-element "index")
+              ;; Get first not visible element, if it's a datemark/gap
+              ;; we might unnecessarely add messages on receiving as
+              ;; they do not have a clock value, but most of the times
+              ;; it will be a message
+              first-not-visible (aget (oops/oget @messages-list-ref "props.data") (inc index))]
+          (when (and first-not-visible
+                     (= :message (:type first-not-visible)))
+            first-not-visible))))))
 
 ;;TODO this is not really working in pair with inserting new messages because we stop inserting new
 ;;messages
@@ -113,18 +113,21 @@
 
 (defn list-footer
   [{:keys [chat insets scroll-y cover-bg-color cover-uri]}]
-  (let [{:keys [chat-id chat-name emoji chat-type group-chat]} chat
-        display-name (if (= chat-type constants/one-to-one-chat-type)
-                       (first (rf/sub [:contacts/contact-two-names-by-identity chat-id]))
-                       (str emoji " " chat-name))
-        loading-messages? (rf/sub [:chats/loading-messages? chat-id])
-        all-loaded? (rf/sub [:chats/all-loaded? chat-id])
-        online? (rf/sub [:visibility-status-updates/online? chat-id])
-        contact (when-not group-chat (rf/sub [:contacts/contact-by-address chat-id]))
-        photo-path (when-not (empty? (:images contact)) (rf/sub [:chats/photo-path chat-id]))]
+  (let [{:keys [chat-id chat-name emoji chat-type
+                group-chat]} chat
+        display-name         (if (= chat-type constants/one-to-one-chat-type)
+                               (first (rf/sub [:contacts/contact-two-names-by-identity chat-id]))
+                               (str emoji " " chat-name))
+        loading-messages?    (rf/sub [:chats/loading-messages? chat-id])
+        all-loaded?          (rf/sub [:chats/all-loaded? chat-id])
+        online?              (rf/sub [:visibility-status-updates/online? chat-id])
+        contact              (when-not group-chat (rf/sub [:contacts/contact-by-address chat-id]))
+        photo-path           (when-not (empty? (:images contact)) (rf/sub [:chats/photo-path chat-id]))]
     [:f>
      (fn []
-       (let [border-animation (reanimated/interpolate scroll-y [50 100] [14 0]
+       (let [border-animation (reanimated/interpolate scroll-y
+                                                      [50 100]
+                                                      [14 0]
                                                       {:extrapolateLeft  "clamp"
                                                        :extrapolateRight "clamp"})]
          [:<>
@@ -143,10 +146,11 @@
                        :background-color cover-bg-color}}])
            [reanimated/view {:style (style/header-bottom-part border-animation)}
             [rn/view {:style style/header-avatar}
-             [user-avatar/user-avatar {:full-name       display-name
-                                       :online?         online?
-                                       :profile-picture photo-path
-                                       :size            :big}]
+             [user-avatar/user-avatar
+              {:full-name       display-name
+               :online?         online?
+               :profile-picture photo-path
+               :size            :big}]
              [quo/text
               {:weight          :semi-bold
                :size            :heading-1
@@ -182,22 +186,24 @@
   [event initial-y scroll-y]
   (let [content-size-y (- (oops/oget event "nativeEvent.contentSize.height")
                           (oops/oget event "nativeEvent.layoutMeasurement.height"))
-        current-y (+ (oops/oget event "nativeEvent.contentOffset.y") initial-y)]
+        current-y      (+ (oops/oget event "nativeEvent.contentOffset.y") initial-y)]
     (reanimated/set-shared-value scroll-y (- content-size-y current-y))))
 
 (defn messages-list
   [{:keys [chat show-input? cover-bg-color header-comp footer-comp]}]
-  (let [{:keys [group-chat chat-id public? community-id admins]} chat
-        messages (rf/sub [:chats/raw-chat-messages-stream chat-id])]
+  (let [{:keys [group-chat chat-id public? community-id
+                admins]} chat
+        messages         (rf/sub [:chats/raw-chat-messages-stream chat-id])]
     [safe-area/consumer
      (fn [insets]
-       (let [window-height (:height (rn/get-window))
+       (let [window-height     (:height (rn/get-window))
              status-bar-height (rn/status-bar-height)
-             ;; view height calculation is different because window height is different on iOS and Android:
+             ;; view height calculation is different because window height is different on iOS and
+             ;; Android:
              view-height       (if platform/ios?
                                  window-height
                                  (+ window-height status-bar-height))
-             initial-y (if platform/ios? (- (:top insets)) 0)]
+             initial-y         (if platform/ios? (- (:top insets)) 0)]
          [:f>
           (fn []
             (let [scroll-y (reanimated/use-shared-value initial-y)]
@@ -220,10 +226,11 @@
                  {:key-fn                       list-key-fn
                   :ref                          list-ref
                   :header                       [list-header chat]
-                  :footer                       [list-footer {:chat           chat
-                                                              :insets         insets
-                                                              :scroll-y       scroll-y
-                                                              :cover-bg-color cover-bg-color}]
+                  :footer                       [list-footer
+                                                 {:chat           chat
+                                                  :insets         insets
+                                                  :scroll-y       scroll-y
+                                                  :cover-bg-color cover-bg-color}]
                   :data                         messages
                   :render-data                  (get-render-data {:group-chat      group-chat
                                                                   :chat-id         chat-id
@@ -236,8 +243,8 @@
                   :render-fn                    render-fn
                   :on-viewable-items-changed    on-viewable-items-changed
                   :on-end-reached               list-on-end-reached
-                  :on-scroll-to-index-failed    identity    ;;don't remove this
-                  :scroll-indicator-insets      {:top 16}   ;;ios only
+                  :on-scroll-to-index-failed    identity  ;;don't remove this
+                  :scroll-indicator-insets      {:top 16} ;;ios only
                   :content-container-style      {:padding-top    16
                                                  :padding-bottom 16}
                   :keyboard-dismiss-mode        :interactive
