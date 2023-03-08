@@ -93,21 +93,17 @@
    :chevron?            true
    :add-divider?        false})
 
-(defn channel-options
-  [community-id id token-gated? muted?]
-  [[(view-members id)
-    (when token-gated? (view-token-gating id))
-    (mark-as-read id)
-    (mute-channel (str community-id id) muted?)
-    (notifications)
-    (fetch-messages)
-    (invite-contacts id)
-    (show-qr id)
-    (share-channel id)]])
-
 (defn channel-options-bottom-sheet
   [community-id id]
   (let [{:keys [token-gated?]} (rf/sub [:communities/community id])
         {:keys [muted]}        (rf/sub [:chat-by-id (str community-id id)])]
     [quo/action-drawer
-     (channel-options community-id id token-gated? muted)]))
+     [[(view-members id)
+       (when token-gated? (view-token-gating id))
+       (mark-as-read id)
+       (mute-channel (str community-id id) muted)
+       (notifications)
+       (fetch-messages)
+       (invite-contacts id)
+       (show-qr id)
+       (share-channel id)]]]))
