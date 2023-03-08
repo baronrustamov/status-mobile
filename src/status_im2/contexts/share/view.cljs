@@ -36,31 +36,36 @@
      :style  style/header-heading}
     (i18n/label :t/share)]])
 
+;;;;            emoji-hash       "🙈🤭🤓😂🤷🏻😈😇🤑🥳😍🥺"
+
 (defn profile-tab [window-width]
-      (let [multiaccounts    (rf/sub [:multiaccount/accounts])
-            multiaccount     (rf/sub [:multiaccount])
-            keyuid           (get multiaccount :key-uid)
-            current-pk       (rf/sub [:multiaccount/public-key])
-            port             (rf/sub [:mediaserver/port])
-            emoji-hash       "🙈🤭🤓😂🤷🏻😈😇🤑🥳😍🥺"
-;            emoji-hash       (get multiaccount :key-uid)
-            profile-qr-url   (str "https://join.status.im/u/"  current-pk)
-            media-server-url (str "https://localhost:"
-                                  port
-                                  "/GenerateQRCode?level=2&url="
-                                  (js/btoa profile-qr-url)
-                                  "&keyUid="
-                                  keyuid
-                                  "&allowProfileImage=true"
-                                  "&size=200"
-                                  "&imageName=large")
+      (let [
+;            emoji-hash-collection  (rf/sub [:multiaccount/emoji-hash])
+;            emoji-hash             (map #(str %) emoji-hash-collection)
+             emoji-hash            "🙈🤭🤓😂🤷🏻😈😇🤑🥳😍🥺"
+            multiaccounts          (rf/sub [:multiaccount/accounts])
+            multiaccount           (rf/sub [:multiaccount])
+            keyuid                 (get multiaccount :key-uid)
+            current-pk             (rf/sub [:multiaccount/public-key]) ;; idk why this section breaks!
+            port                   (rf/sub [:mediaserver/port])
+            profile-qr-url         (str "https://join.status.im/u/"  current-pk)
+            media-server-url       (str "https://localhost:"
+                                    port
+                                    "/GenerateQRCode?level=2&url="
+                                    (js/btoa profile-qr-url)
+                                    "&keyUid="
+                                    keyuid
+                                    "&allowProfileImage=true"
+                                    "&size=200"
+                                    "&imageName=large")
 ;            public-key     (multiaccount :public-key)
             ;;emoji-hash     (:emoji-hash multiaccount) ;;; TODO(siddarthay) : when multiaccount is created
                                                       ;;; make call back to native module statusgo and fetch
                                                       ;;; the emoji hash from and then store it in app-db
 
             ]
-        (log/info "media-server-url" media-server-url)
+;        (log/info "media-server-url" media-server-url)
+        (log/info "emoji-hash ->" (rf/sub [:multiaccount/emoji-hash]))
       [:<>
        [rn/view {:style (style/qr-code-container window-width)}
         ;;; todo now qr-code-viewer can be replaced with either a fast-image or a
