@@ -41,6 +41,7 @@
 (defn mute-channel
   [id muted?]
   {:icon                (if muted? :i/muted :i/activity-center)
+   :icon-color :red
    :accessibility-label (if muted? :unmute-channel :mute-channel)
    :label               (i18n/label (if muted? :t/unmute-channel :t/mute-channel))
    :on-press            (if muted?
