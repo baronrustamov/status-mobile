@@ -4,6 +4,7 @@
             [react-native.safe-area :as safe-area]
             [react-native.background-timer :as background-timer]
             [react-native.core :as rn]
+            [react-native.hooks :as hooks]
             [react-native.platform :as platform]
             [reagent.core :as reagent]
             [quo2.foundations.colors :as colors]
@@ -111,19 +112,38 @@
   [evt]
   (reset! messages-view-height (oops/oget evt "nativeEvent.layout.height")))
 
+(defn contact-icon
+  [{:keys [ens-verified added?]}]
+  (when (or ens-verified added?)
+    [rn/view
+     {:style {:padding-left 10
+              :margin-top   2}}
+     (if ens-verified
+       [quo/icon :i/verified
+        {:no-color true
+         :size     20
+         :color    (colors/theme-colors colors/success-50 colors/success-60)}]
+       (when added?
+         [quo/icon :i/contact
+          {:no-color true
+           :size     20
+           :color    (colors/theme-colors colors/primary-50 colors/primary-60)}]))]))
+
 (defn list-footer
-  [{:keys [chat insets scroll-y cover-bg-color cover-uri]}]
+  [{:keys [chat scroll-y cover-bg-color cover-uri]}]
   (let [{:keys [chat-id chat-name emoji chat-type
                 group-chat]} chat
         display-name         (if (= chat-type constants/one-to-one-chat-type)
                                (first (rf/sub [:contacts/contact-two-names-by-identity chat-id]))
                                (str emoji " " chat-name))
-        {:keys [bio]} (rf/sub [:contacts/contact-by-identity chat-id])
+        {:keys [bio]}        (rf/sub [:contacts/contact-by-identity chat-id])
         loading-messages?    (rf/sub [:chats/loading-messages? chat-id])
         all-loaded?          (rf/sub [:chats/all-loaded? chat-id])
         online?              (rf/sub [:visibility-status-updates/online? chat-id])
-        contact              (when-not group-chat (rf/sub [:contacts/contact-by-address chat-id]))
-        photo-path           (when-not (empty? (:images contact)) (rf/sub [:chats/photo-path chat-id]))]
+        contact              (when-not group-chat
+                               (rf/sub [:contacts/contact-by-address chat-id]))
+        photo-path           (when-not (empty? (:images contact))
+                               (rf/sub [:chats/photo-path chat-id]))]
     [:f>
      (fn []
        (let [border-animation (reanimated/interpolate scroll-y
@@ -144,7 +164,7 @@
            (when cover-bg-color
              [rn/view
               {:style {:width            "100%"
-                       :height           style/overscroll-cover-height
+                       :height           (+ style/overscroll-cover-height style/cover-height)
                        :background-color cover-bg-color}}])
            [reanimated/view {:style (style/header-bottom-part border-animation)}
             [rn/view {:style style/header-avatar}
@@ -154,14 +174,16 @@
                  :online?         online?
                  :profile-picture photo-path
                  :size            :big}])
-             [quo/text
-              {:weight          :semi-bold
-               :size            :heading-1
-               :style           {:margin-top (if group-chat 54 12)}
-               :number-of-lines 1}
-              display-name]
+             [rn/view {:style style/name-container}
+              [quo/text
+               {:weight          :semi-bold
+                :size            :heading-1
+                :style           {:margin-top (if group-chat 54 12)}
+                :number-of-lines 1}
+               display-name
+               [contact-icon contact]]]
              (when bio
-               [quo/text {:style {:margin-top 8}}
+               [quo/text {:style style/bio}
                 bio])]]]
           (when (or loading-messages? (not chat-id) (not all-loaded?))
             [rn/view {:style (when platform/android? {:scaleY -1})}
@@ -202,15 +224,23 @@
      (fn [insets]
        (let [window-height     (:height (rn/get-window))
              status-bar-height (rn/status-bar-height)
-             ;; view height calculation is different because window height is different on iOS and
-             ;; Android:
+             ;; view height calculation is different because
+             ;; window height is different on iOS and Android:
              view-height       (if platform/ios?
                                  window-height
                                  (+ window-height status-bar-height))
              initial-y         (if platform/ios? (- (:top insets)) 0)]
          [:f>
           (fn []
-            (let [scroll-y (reanimated/use-shared-value initial-y)]
+            (let [scroll-y                                 (reanimated/use-shared-value initial-y)
+                  {:keys [keyboard-shown keyboard-height]} (hooks/use-keyboard)]
+              (rn/use-effect
+               (fn []
+                 (when keyboard-shown
+                   (reanimated/set-shared-value scroll-y
+                                                (+ (reanimated/get-shared-value scroll-y)
+                                                   keyboard-height))))
+               [keyboard-shown keyboard-height])
               [rn/keyboard-avoiding-view
                {:style                  (style/keyboard-avoiding-container view-height)
                 :keyboardVerticalOffset (- (:bottom insets))}
@@ -241,8 +271,8 @@
                   :render-fn                    render-fn
                   :on-viewable-items-changed    on-viewable-items-changed
                   :on-end-reached               list-on-end-reached
-                  :on-scroll-to-index-failed    identity  ;;don't remove this
-                  :scroll-indicator-insets      {:top -32
+                  :on-scroll-to-index-failed    identity ;;don't remove this
+                  :scroll-indicator-insets      {:top    -32
                                                  :bottom 100} ;;ios only
                   :content-container-style      style/list-container
                   :keyboard-dismiss-mode        :interactive

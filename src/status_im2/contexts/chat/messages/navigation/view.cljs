@@ -20,23 +20,28 @@
                               (first (rf/sub [:contacts/contact-two-names-by-identity chat-id]))
                               (str emoji " " chat-name))
         online?             (rf/sub [:visibility-status-updates/online? chat-id])
-        contact             (when-not group-chat (rf/sub [:contacts/contact-by-address chat-id]))
-        photo-path          (when-not (empty? (:images contact)) (rf/sub [:chats/photo-path chat-id]))]
+        contact             (when-not group-chat
+                              (rf/sub [:contacts/contact-by-address chat-id]))
+        photo-path          (when-not (empty? (:images contact))
+                              (rf/sub [:chats/photo-path chat-id]))]
     (fn []
       [:f>
        (fn []
          (let [opacity-animation        (reanimated/interpolate scroll-y
-                                                                [-100 0]
+                                                                [style/navigation-bar-height
+                                                                 (+ style/navigation-bar-height 100)]
                                                                 [0 1]
                                                                 {:extrapolateLeft  "clamp"
                                                                  :extrapolateRight "extend"})
                banner-opacity-animation (reanimated/interpolate scroll-y
-                                                                [80 120]
+                                                                [(+ style/navigation-bar-height 50)
+                                                                 (+ style/navigation-bar-height 100)]
                                                                 [0 1]
                                                                 {:extrapolateLeft  "clamp"
                                                                  :extrapolateRight "clamp"})
                translate-animation      (reanimated/interpolate scroll-y
-                                                                [0 50]
+                                                                [style/navigation-bar-height
+                                                                 (+ style/navigation-bar-height 50)]
                                                                 [50 0]
                                                                 {:extrapolateLeft  "clamp"
                                                                  :extrapolateRight "clamp"})
@@ -60,7 +65,8 @@
                 :style          (style/button-container {:margin-left 20})}
                [quo/icon :i/arrow-left
                 {:size 20 :color (colors/theme-colors colors/black colors/white)}]]
-              [reanimated/view {:style (style/animated-header translate-animation title-opacity-animation)}
+              [reanimated/view
+               {:style (style/animated-header translate-animation title-opacity-animation)}
                [rn/view {:style style/header-container}
                 (when-not group-chat
                   [rn/view {:style style/header-avatar-container}
@@ -70,12 +76,13 @@
                      :profile-picture photo-path
                      :size            :small}]])
                 [rn/view {:style style/header-text-container}
-                 [quo/text
-                  {:weight          :semi-bold
-                   :size            :paragraph-1
-                   :number-of-lines 1
-                   :style           (style/header-display-name)}
-                  display-name]
+                 [rn/view {:style {:flex-direction :row}}
+                  [quo/text
+                   {:weight          :semi-bold
+                    :size            :paragraph-1
+                    :number-of-lines 1
+                    :style           (style/header-display-name)}
+                   display-name]]
                  (when online?
                    [quo/text
                     {:number-of-lines 1

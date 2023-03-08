@@ -40,7 +40,14 @@
     :display          :flex}))
 
 (def header-avatar
-  {:top -36
+  {:top           -36
    :margin-left   20
    :margin-right  20
    :margin-bottom -36})
+
+(def name-container
+  {:flex-direction :row
+   :align-items    :center})
+
+(def bio
+  {:margin-top 8})
