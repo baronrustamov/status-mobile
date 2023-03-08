@@ -118,6 +118,7 @@
         display-name         (if (= chat-type constants/one-to-one-chat-type)
                                (first (rf/sub [:contacts/contact-two-names-by-identity chat-id]))
                                (str emoji " " chat-name))
+        {:keys [bio]} (rf/sub [:contacts/contact-by-identity chat-id])
         loading-messages?    (rf/sub [:chats/loading-messages? chat-id])
         all-loaded?          (rf/sub [:chats/all-loaded? chat-id])
         online?              (rf/sub [:visibility-status-updates/online? chat-id])
@@ -146,11 +147,12 @@
                        :background-color cover-bg-color}}])
            [reanimated/view {:style (style/header-bottom-part border-animation)}
             [rn/view {:style style/header-avatar}
-             [user-avatar/user-avatar
-              {:full-name       display-name
-               :online?         online?
-               :profile-picture photo-path
-               :size            :big}]
+             (when-not group-chat
+               [user-avatar/user-avatar
+                {:full-name       display-name
+                 :online?         online?
+                 :profile-picture photo-path
+                 :size            :big}])
              [quo/text
               {:weight          :semi-bold
                :size            :heading-1
@@ -245,8 +247,7 @@
                   :on-end-reached               list-on-end-reached
                   :on-scroll-to-index-failed    identity  ;;don't remove this
                   :scroll-indicator-insets      {:top 16} ;;ios only
-                  :content-container-style      {:padding-top    16
-                                                 :padding-bottom 16}
+                  :content-container-style      style/list-container
                   :keyboard-dismiss-mode        :interactive
                   :keyboard-should-persist-taps :handled
                   :onMomentumScrollBegin        state/start-scrolling

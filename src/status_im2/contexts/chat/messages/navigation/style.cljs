@@ -66,5 +66,4 @@
    :margin-right   8})
 
 (def header-display-name
-  {:margin-left 8
-   :flex        1})
+  {:flex 1})

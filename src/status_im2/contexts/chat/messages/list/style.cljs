@@ -8,6 +8,10 @@
 (def footer
   {:z-index 5})
 
+(def list-container
+  {:padding-top    16
+   :padding-bottom 16})
+
 (defn header-bottom-part
   [animation]
   (reanimated/apply-animations-to-style

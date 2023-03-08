@@ -61,11 +61,13 @@
                 {:size 20 :color (colors/theme-colors colors/black colors/white)}]]
               [reanimated/view {:style (style/header translate-animation title-opacity-animation)}
                [rn/view {:style style/header-text-container}
-                [user-avatar/user-avatar
-                 {:full-name       display-name
-                  :online?         online?
-                  :profile-picture photo-path
-                  :size            :small}]
+                (when-not group-chat
+                  [rn/view {:style {:margin-right 8}}
+                   [user-avatar/user-avatar
+                    {:full-name       display-name
+                     :online?         online?
+                     :profile-picture photo-path
+                     :size            :small}]])
                 [quo/text
                  {:weight          :semi-bold
                   :number-of-lines 1
