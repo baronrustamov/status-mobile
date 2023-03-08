@@ -13,7 +13,7 @@
             [status-im.ui.components.qr-code-viewer.views :as qr-code-viewer]
             [status-im.ui.components.copyable-text :as copyable-text]
             [react-native.fast-image :as fast-image]
-            ))
+            [clojure.string :as string]))
 
 (def ^:const profile-tab-id 0)
 (def ^:const wallet-tab-id 1)
@@ -39,12 +39,9 @@
 ;;;;            emoji-hash       "🙈🤭🤓😂🤷🏻😈😇🤑🥳😍🥺"
 
 (defn profile-tab [window-width]
-      (let [
-;            emoji-hash-collection  (rf/sub [:multiaccount/emoji-hash])
-;            emoji-hash             (map #(str %) emoji-hash-collection)
-             emoji-hash            "🙈🤭🤓😂🤷🏻😈😇🤑🥳😍🥺"
-            multiaccounts          (rf/sub [:multiaccount/accounts])
+      (let [multiaccounts          (rf/sub [:multiaccount/accounts])
             multiaccount           (rf/sub [:multiaccount])
+            emoji-hash             (string/join " " (get multiaccount :emoji-hash))
             keyuid                 (get multiaccount :key-uid)
             current-pk             (rf/sub [:multiaccount/public-key]) ;; idk why this section breaks!
             port                   (rf/sub [:mediaserver/port])
@@ -65,7 +62,7 @@
 
             ]
 ;        (log/info "media-server-url" media-server-url)
-        (log/info "emoji-hash ->" (rf/sub [:multiaccount/emoji-hash]))
+        (log/info "emoji-hash ->"  (string/join " " (get multiaccount :emoji-hash)))
       [:<>
        [rn/view {:style (style/qr-code-container window-width)}
         ;;; todo now qr-code-viewer can be replaced with either a fast-image or a
