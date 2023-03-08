@@ -273,16 +273,6 @@
      categories-and-chats)))
 
 (re-frame/reg-sub
- :communities/channel-by-id
- (fn [[_ {:keys [community-id]}]]
-   [(re-frame/subscribe [:communities/categorized-channels community-id])])
- (fn [channels _ [{:keys [channel-id]}]]
-   (->> channels
-        vals
-        (apply concat)
-        (some #(when (= (:id %) channel-id) %)))))
-
-(re-frame/reg-sub
  :communities/users
  :<- [:communities]
  (fn [_ [_ _]]

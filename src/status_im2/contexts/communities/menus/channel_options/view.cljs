@@ -20,8 +20,7 @@
   [id]
   {:icon                :i/members
    :accessibility-label :view-members
-   :label               (i18n/label :t/view-channel-members-and-details)
-   :on-press            #()})
+   :label               (i18n/label :t/view-channel-members-and-details)})
 
 (defn view-token-gating
   [id]
@@ -44,8 +43,6 @@
   {:icon                (if muted? :i/muted :i/activity-center)
    :accessibility-label (if muted? :unmute-channel :mute-channel)
    :label               (i18n/label (if muted? :t/unmute-channel :t/mute-channel))
-   #_:sub-label
-   #_(when muted? (str "muted for 15 minutes"))
    :on-press            (if muted?
                           #(unmute-channel-action id)
                           #(mute-channel-action id))
@@ -90,7 +87,7 @@
    :label               (i18n/label :t/notifications)
    :on-press            #(js/alert "TODO: to be implemented, requires design input")
    :danger?             false
-   :sub-label           "All messages"
+   :sub-label           (i18n/label :t/all-messages)
    :accessibility-label :manage-notifications
    :right-icon          :i/chevron-right
    :chevron?            true
