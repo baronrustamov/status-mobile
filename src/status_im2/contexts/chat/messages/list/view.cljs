@@ -134,16 +134,17 @@
          [:<>
           [rn/view
            {:style {:background-color (colors/theme-colors colors/white colors/neutral-95)
-                    :top              (- 0 (- (:bottom insets) 16))}}
+                    :top              (- 0 style/overscroll-cover-height)
+                    :margin-bottom    (- 0 style/overscroll-cover-height)}}
            (when cover-uri
              [fast-image/fast-image
               {:style  {:width  "100%"
-                        :height style/cover-height}
+                        :height style/overscroll-cover-height}
                :source {:uri cover-uri}}])
            (when cover-bg-color
              [rn/view
               {:style {:width            "100%"
-                       :height           style/cover-height
+                       :height           style/overscroll-cover-height
                        :background-color cover-bg-color}}])
            [reanimated/view {:style (style/header-bottom-part border-animation)}
             [rn/view {:style style/header-avatar}
@@ -156,11 +157,12 @@
              [quo/text
               {:weight          :semi-bold
                :size            :heading-1
-               :style           {:margin-top 12}
+               :style           {:margin-top (if group-chat 54 12)}
                :number-of-lines 1}
               display-name]
-             [quo/text {:style {:margin-top 8}}
-              "Web 3.0 Designer @ethstatus • DJ • Producer • Dad • YouTuber."]]]]
+             (when bio
+               [quo/text {:style {:margin-top 8}}
+                bio])]]]
           (when (or loading-messages? (not chat-id) (not all-loaded?))
             [rn/view {:style (when platform/android? {:scaleY -1})}
              [quo/skeleton @messages-view-height]])]))]))
@@ -209,6 +211,7 @@
          [:f>
           (fn []
             (let [scroll-y (reanimated/use-shared-value initial-y)]
+              ;; TODO(alwx):
               [rn/keyboard-avoiding-view
                {:style                  {:position :absolute
                                          :display  :flex
@@ -246,7 +249,8 @@
                   :on-viewable-items-changed    on-viewable-items-changed
                   :on-end-reached               list-on-end-reached
                   :on-scroll-to-index-failed    identity  ;;don't remove this
-                  :scroll-indicator-insets      {:top 16} ;;ios only
+                  :scroll-indicator-insets      {:top 16
+                                                 :bottom 100} ;;ios only
                   :content-container-style      style/list-container
                   :keyboard-dismiss-mode        :interactive
                   :keyboard-should-persist-taps :handled

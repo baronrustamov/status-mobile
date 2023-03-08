@@ -3,6 +3,7 @@
             [react-native.reanimated :as reanimated]))
 
 (def cover-height 168)
+(def overscroll-cover-height 2000)
 (def cover-bg-color "#2A799B33")
 
 (def footer
@@ -17,15 +18,19 @@
   (reanimated/apply-animations-to-style
    {:border-top-right-radius animation
     :border-top-left-radius  animation}
-   {:top              -16
+   {:position         :relative
+    :top              -16
+    :margin-bottom    -16
+    :padding-bottom   24
     :background-color (colors/theme-colors colors/white colors/neutral-100)
     :shadow-radius    16
     :shadow-opacity   1
     :shadow-color     "rgba(9, 16, 28, 0.06)"
-    :shadow-offset    {:width 0 :height -24}}))
+    :shadow-offset    {:width 0 :height -24}
+    :display          :flex}))
 
 (def header-avatar
-  {:margin-top    -36
+  {:top -36
    :margin-left   20
    :margin-right  20
-   :margin-bottom 0})
+   :margin-bottom -36})

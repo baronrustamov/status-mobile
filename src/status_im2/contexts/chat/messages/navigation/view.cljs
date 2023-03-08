@@ -9,7 +9,8 @@
             [status-im2.contexts.chat.messages.navigation.style :as style]
             [status-im2.contexts.chat.messages.pin.banner.view :as pin.banner]
             [status-im2.constants :as constants]
-            [utils.re-frame :as rf]))
+            [utils.re-frame :as rf]
+            [utils.i18n :as i18n]))
 
 (defn navigation-view
   [{:keys [scroll-y]}]
@@ -25,30 +26,30 @@
       [:f>
        (fn []
          (let [opacity-animation        (reanimated/interpolate scroll-y
-                                                                [50 100]
+                                                                [-100 0]
                                                                 [0 1]
                                                                 {:extrapolateLeft  "clamp"
                                                                  :extrapolateRight "extend"})
                banner-opacity-animation (reanimated/interpolate scroll-y
-                                                                [180 220]
+                                                                [80 120]
                                                                 [0 1]
                                                                 {:extrapolateLeft  "clamp"
                                                                  :extrapolateRight "clamp"})
                translate-animation      (reanimated/interpolate scroll-y
-                                                                [100 150]
+                                                                [0 50]
                                                                 [50 0]
                                                                 {:extrapolateLeft  "clamp"
                                                                  :extrapolateRight "clamp"})
                title-opacity-animation  (reanimated/interpolate scroll-y
-                                                                [100 150]
+                                                                [0 50]
                                                                 [0 1]
                                                                 {:extrapolateLeft  "clamp"
                                                                  :extrapolateRight "clamp"})]
            [rn/view {:style style/navigation-view}
             [reanimated/blur-view
              {:blurAmount   32
-              :blurType     :light
-              :overlayColor (if platform/ios? colors/white-opa-70 :transparent)
+              :blurType     (colors/theme-colors :light :dark)
+              :overlayColor (if platform/ios? colors/white :transparent)
               :style        (style/blur-view opacity-animation)}]
 
             [rn/view {:style {:display :flex}}
@@ -68,11 +69,20 @@
                      :online?         online?
                      :profile-picture photo-path
                      :size            :small}]])
-                [quo/text
-                 {:weight          :semi-bold
-                  :number-of-lines 1
-                  :style           style/header-display-name}
-                 display-name]]]
+                [rn/view {:style {:flex 1}}
+                 [quo/text
+                  {:weight          :semi-bold
+                   :size            :paragraph-1
+                   :number-of-lines 1
+                   :style           {:color (colors/theme-colors colors/black colors/white)}}
+                  display-name]
+                 (when online?
+                   [quo/text
+                    {:number-of-lines 1
+                     :weight          :regular
+                     :size            :paragraph-2
+                     :style           {:color (colors/theme-colors colors/neutral-80-opa-50 colors/white-opa-50)}}
+                    (i18n/label :t/online)])]]]
               [rn/touchable-opacity
                {:active-opacity 1
                 :style          (style/button-container {:margin-right 20})}
