@@ -36,14 +36,11 @@
      :style  style/header-heading}
     (i18n/label :t/share)]])
 
-;;;;            emoji-hash       "🙈🤭🤓😂🤷🏻😈😇🤑🥳😍🥺"
-
 (defn profile-tab [window-width]
-      (let [multiaccounts          (rf/sub [:multiaccount/accounts])
-            multiaccount           (rf/sub [:multiaccount])
+      (let [multiaccount           (rf/sub [:multiaccount])
             emoji-hash             (string/join " " (get multiaccount :emoji-hash))
             keyuid                 (get multiaccount :key-uid)
-            current-pk             (rf/sub [:multiaccount/public-key]) ;; idk why this section breaks!
+            current-pk             (get multiaccount :public-key)
             port                   (rf/sub [:mediaserver/port])
             profile-qr-url         (str "https://join.status.im/u/"  current-pk)
             media-server-url       (str "https://localhost:"
@@ -54,26 +51,12 @@
                                     keyuid
                                     "&allowProfileImage=true"
                                     "&size=200"
-                                    "&imageName=large")
-;            public-key     (multiaccount :public-key)
-            ;;emoji-hash     (:emoji-hash multiaccount) ;;; TODO(siddarthay) : when multiaccount is created
-                                                      ;;; make call back to native module statusgo and fetch
-                                                      ;;; the emoji hash from and then store it in app-db
-
-            ]
-;        (log/info "media-server-url" media-server-url)
+                                    "&imageName=large")]
         (log/info "emoji-hash ->"  (string/join " " (get multiaccount :emoji-hash)))
       [:<>
        [rn/view {:style (style/qr-code-container window-width)}
-        ;;; todo now qr-code-viewer can be replaced with either a fast-image or a
-        ;;; react-native image component and we could directly call the media server
-;        [qr-code-viewer/qr-code-view (* window-width 0.808) profile-qr-url 12 colors/white]
         [rn/view {:style {:flex-direction :row
                           :justify-content :center}}
-;         [fast-image/fast-image
-;          {:style  {:width  "100%"
-;                    :height 300}
-;           :source {:uri media-server-url}}]
             [rn/image {:source {:uri           media-server-url}
                        :style  {:width         303
                                 :height        303
