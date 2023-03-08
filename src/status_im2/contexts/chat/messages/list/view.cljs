@@ -211,15 +211,8 @@
          [:f>
           (fn []
             (let [scroll-y (reanimated/use-shared-value initial-y)]
-              ;; TODO(alwx):
               [rn/keyboard-avoiding-view
-               {:style                  {:position :absolute
-                                         :display  :flex
-                                         :flex     1
-                                         :top      0
-                                         :left     0
-                                         :height   view-height
-                                         :right    0}
+               {:style                  (style/keyboard-avoiding-container view-height)
                 :keyboardVerticalOffset (- (:bottom insets))}
 
                (when header-comp
@@ -249,7 +242,7 @@
                   :on-viewable-items-changed    on-viewable-items-changed
                   :on-end-reached               list-on-end-reached
                   :on-scroll-to-index-failed    identity  ;;don't remove this
-                  :scroll-indicator-insets      {:top 16
+                  :scroll-indicator-insets      {:top -32
                                                  :bottom 100} ;;ios only
                   :content-container-style      style/list-container
                   :keyboard-dismiss-mode        :interactive

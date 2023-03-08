@@ -53,35 +53,35 @@
               :style        (style/blur-view opacity-animation)}]
 
             [rn/view {:style {:display :flex}}
-             [rn/view {:style style/header-container}
+             [rn/view {:style style/header}
               [rn/touchable-opacity
                {:active-opacity 1
                 :on-press       #(rf/dispatch [:navigate-back])
                 :style          (style/button-container {:margin-left 20})}
                [quo/icon :i/arrow-left
                 {:size 20 :color (colors/theme-colors colors/black colors/white)}]]
-              [reanimated/view {:style (style/header translate-animation title-opacity-animation)}
-               [rn/view {:style style/header-text-container}
+              [reanimated/view {:style (style/animated-header translate-animation title-opacity-animation)}
+               [rn/view {:style style/header-container}
                 (when-not group-chat
-                  [rn/view {:style {:margin-right 8}}
+                  [rn/view {:style style/header-avatar-container}
                    [user-avatar/user-avatar
                     {:full-name       display-name
                      :online?         online?
                      :profile-picture photo-path
                      :size            :small}]])
-                [rn/view {:style {:flex 1}}
+                [rn/view {:style style/header-text-container}
                  [quo/text
                   {:weight          :semi-bold
                    :size            :paragraph-1
                    :number-of-lines 1
-                   :style           {:color (colors/theme-colors colors/black colors/white)}}
+                   :style           (style/header-display-name)}
                   display-name]
                  (when online?
                    [quo/text
                     {:number-of-lines 1
                      :weight          :regular
                      :size            :paragraph-2
-                     :style           {:color (colors/theme-colors colors/neutral-80-opa-50 colors/white-opa-50)}}
+                     :style           (style/header-online)}
                     (i18n/label :t/online)])]]]
               [rn/touchable-opacity
                {:active-opacity 1

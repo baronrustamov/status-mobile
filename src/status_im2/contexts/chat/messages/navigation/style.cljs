@@ -32,7 +32,7 @@
 (def navigation-view
   {:z-index 4})
 
-(def header-container
+(def header
   {:position       :absolute
    :top            56
    :left           0
@@ -43,7 +43,7 @@
    :flex-direction :row
    :overflow       :hidden})
 
-(defn header
+(defn animated-header
   [y-animation opacity-animation]
   (reanimated/apply-animations-to-style
     ;; here using `left` won't work on Android, so we are using `translateX`
@@ -59,7 +59,7 @@
      :width    "100%"
      :top      navigation-bar-height}))
 
-(def header-text-container
+(def header-container
   {:flex-direction :row
    :align-items    :center
    :margin-left    8
@@ -67,5 +67,14 @@
    :margin-top     -4
    :height         40})
 
-(def header-display-name
+(def header-avatar-container
+  {:margin-right 8})
+
+(def header-text-container
   {:flex 1})
+
+(defn header-display-name []
+  {:color (colors/theme-colors colors/black colors/white)})
+
+(defn header-online []
+  {:color (colors/theme-colors colors/neutral-80-opa-50 colors/white-opa-50)})

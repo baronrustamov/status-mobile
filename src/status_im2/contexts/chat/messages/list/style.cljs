@@ -9,6 +9,16 @@
 (def footer
   {:z-index 5})
 
+(defn keyboard-avoiding-container
+  [view-height]
+  {:position :absolute
+   :display  :flex
+   :flex     1
+   :top      0
+   :left     0
+   :height   view-height
+   :right    0})
+
 (def list-container
   {:padding-top    16
    :padding-bottom 16})
