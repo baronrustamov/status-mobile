@@ -7,7 +7,6 @@
             [reagent.core :as reagent]
             [status-im2.common.resources :as resources]
             [status-im2.contexts.communities.menus.community-options.view :as options]
-            [status-im.ui.screens.communities.community :as community]
             [status-im.ui.components.react :as react]
             [react-native.platform :as platform]
             [status-im2.common.scroll-page.view :as scroll-page]
@@ -26,7 +25,7 @@
   [community-item _ _ {:keys [width view-type]}]
   (let [item  (merge community-item
                      (get mock-community-item-data :data))
-        cover {:uri (get-in (:images item) [:banner :uri])}]
+        cover {:uri (get-in (:images community-item) [:banner :uri])}]
     (if (= view-type :card-view)
       [quo/community-card-view-item (assoc item :width width :cover cover)
        #(rf/dispatch [:navigate-to :community-overview (:id item)])]
@@ -89,7 +88,6 @@
                        :label               (i18n/label :t/gated)
                        :accessibility-label :gated-communities-tab}]}]])
 
-
 (defn featured-list
   [communities view-type]
   (let [view-size (reagent/atom 0)]
@@ -97,8 +95,8 @@
       [rn/view
        {:style     style/featured-list-container
         :on-layout #(swap! view-size
-                           (fn []
-                             (- (oops/oget % "nativeEvent.layout.width") 20)))}
+                      (fn []
+                        (- (oops/oget % "nativeEvent.layout.width") 20)))}
        (when-not (= @view-size 0)
          [rn/flat-list
           {:key-fn                            :id
@@ -127,32 +125,16 @@
 (defn other-communities-list
   [{:keys [communities communities-ids view-type]}]
   [rn/view {:style style/other-communities-container}
-   (map-indexed
-    (fn [inner-index item]
-      (let [community-id (when communities-ids item)
-            community    (if communities
-                           item
-                           [rf/sub [:communities/home-item community-id]])]
-        [rn/view
-         {:key           (str inner-index (:id community))
-          :margin-bottom 16}
-         (if (= view-type :card-view)
-           [quo/community-card-view-item
-            (merge community
-                   (get mock-community-item-data :data))
-            #(rf/dispatch [:navigate-to :community-overview (:id community)])]
-           [quo/communities-list-view-item
-            {:on-press      (fn []
-                              (rf/dispatch [:communities/load-category-states (:id community)])
-                              (rf/dispatch [:dismiss-keyboard])
-                              (rf/dispatch [:navigate-to :community (:id community)]))
-             :on-long-press #(rf/dispatch [:bottom-sheet/show-sheet
-                                           {:content (fn []
-                                                       ;; TODO implement with quo2
-                                                       [community/community-actions community])}])}
-            (merge community
-                   (get mock-community-item-data :data))])]))
-    (if communities communities communities-ids))])
+   [rn/flat-list
+    {:key-fn                            :id
+     :keyboard-should-persist-taps      :always
+     :shows-horizontal-scroll-indicator false
+     :separator                         [rn/view {:height 16}]
+     :data                              (if communities
+                                          communities
+                                          communities-ids)
+     :render-fn                         community-list-item
+     :render-data                       {:view-type view-type}}]])
 
 
 (defn communities-lists

@@ -99,7 +99,7 @@
 
 
 (defn display-picture
-  [scroll-height cover]
+  [scroll-height logo]
   (let [input-range (if platform/ios? [-67 10] [0 150])
         y           (reanimated/use-shared-value scroll-height)
         animation   (reanimated/interpolate y
@@ -114,7 +114,7 @@
     [reanimated/view
      {:style (style/display-picture-container animation)}
      [rn/image
-      {:source cover
+      {:source logo
        :style  style/display-picture}]]))
 
 (defn scroll-page
@@ -160,6 +160,6 @@
                                               {:flex             1
                                                :border-radius    (diff-with-max-min @scroll-height 16 0)
                                                :background-color background-color}
-                                              (when cover-image
-                                                [:f> display-picture @scroll-height cover-image])
+                                              (when logo
+                                                [:f> display-picture @scroll-height logo])
                                               children])]}]])))
