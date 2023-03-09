@@ -21,10 +21,9 @@
       [rn/view (style/community-cover-container 60)
        [rn/image
         {:source cover
-         :style
-         {:flex                    1
-          :border-top-right-radius 20
-          :border-top-left-radius  20}}]]
+         :style  {:flex                    1
+                  :border-top-right-radius 20
+                  :border-top-left-radius  20}}]]
       [rn/view (style/card-view-content-container 12)
        [rn/view (style/card-view-chat-icon 48)
         [icon/community-icon {:images images} 48]]
