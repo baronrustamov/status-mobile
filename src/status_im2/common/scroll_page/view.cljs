@@ -107,6 +107,38 @@
       {:source logo
        :style  style/display-picture}]]))
 
+(defn render-page
+  [cover-image children background-color scroll-height logo on-scroll]
+  [rn/flat-list
+   {:content-container-style         (style/scroll-view-container
+                                      (diff-with-max-min @scroll-height 16 0))
+    :shows-vertical-scroll-indicator false
+    :scroll-event-throttle           16
+    :on-scroll                       (fn [^js event]
+                                       (reset! scroll-height (int
+                                                              (oops/oget
+                                                               event
+                                                               "nativeEvent.contentOffset.y")))
+                                       (when on-scroll
+                                         (on-scroll @scroll-height)))
+    :header                          [rn/view {:style {:flex 1}}
+                                      (when cover-image
+                                        [rn/view {:style {:height 151}}
+                                         [rn/image
+                                          {:source cover-image
+                                           :style  {:overflow :visible
+                                                    :flex     1}}]])
+                                      (when children
+                                        [rn/view
+                                         {:flex             1
+                                          :border-radius    (diff-with-max-min @scroll-height 16 0)
+                                          :background-color background-color}
+                                         (when logo
+                                           [:f> display-picture @scroll-height logo])])]
+    :data                            children
+    :render-fn                       [rn/view {:flex 1}
+                                      children]}])
+
 (defn scroll-page
   [_ _ _]
   (let [scroll-height (reagent/atom negative-scroll-position-0)]
@@ -142,5 +174,8 @@
                                                :border-radius    (diff-with-max-min @scroll-height 16 0)
                                                :background-color background-color}
                                               (when logo
-                                                [:f> display-picture @scroll-height logo])
-                                              children])]}]])))
+                                                [:f> display-picture @scroll-height logo])])]
+         :data                            children
+         :render-fn                       (fn []
+                                            [rn/view {:flex 1}
+                                             children])}]])))

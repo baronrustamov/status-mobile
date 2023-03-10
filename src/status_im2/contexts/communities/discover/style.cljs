@@ -22,8 +22,7 @@
 
 (def featured-list-container
   {:flex-direction :row
-   :overflow       :hidden
-   :margin-right   20})
+   :overflow       :hidden})
 
 (def flat-list-container
   {:padding-bottom     24

@@ -22,22 +22,23 @@
                                       :token-icon (resources/get-mock-image :status-logo)}]}]}})
 
 (defn community-list-item
-  [community-item _ _ {:keys [width view-type]}]
-  (let [item  (merge community-item
-                     (get mock-community-item-data :data))
-        cover {:uri (get-in (:images community-item) [:banner :uri])}]
+  [{:keys [id] :as community} _ _ {:keys [width view-type]}]
+  (let [community-item (merge
+                        community
+                        (get mock-community-item-data :data))
+        cover          {:uri (get-in (:images community) [:banner :uri])}]
     (if (= view-type :card-view)
-      [quo/community-card-view-item (assoc item :width width :cover cover)
-       #(rf/dispatch [:navigate-to :community-overview (:id item)])]
+      [quo/community-card-view-item (assoc community-item :width width :cover cover)
+       #(rf/dispatch [:navigate-to :community-overview (:id community)])]
       [quo/communities-list-view-item
        {:on-press      (fn []
-                         (rf/dispatch [:communities/load-category-states (:id item)])
+                         (rf/dispatch [:communities/load-category-states id])
                          (rf/dispatch [:dismiss-keyboard])
-                         (rf/dispatch [:navigate-to :community {:community-id (:id item)}]))
+                         (rf/dispatch [:navigate-to :community {:community-id id}]))
         :on-long-press #(rf/dispatch
                          [:bottom-sheet/show-sheet
                           {:content (fn []
-                                      [options/community-options-bottom-sheet (:id item)])}])}])))
+                                      [options/community-options-bottom-sheet id])}])}])))
 
 (defn screen-title
   []
@@ -96,7 +97,7 @@
        {:style     style/featured-list-container
         :on-layout #(swap! view-size
                       (fn []
-                        (- (oops/oget % "nativeEvent.layout.width") 20)))}
+                        (- (oops/oget % "nativeEvent.layout.width") 40)))}
        (when-not (= @view-size 0)
          [rn/flat-list
           {:key-fn                            :id
@@ -110,6 +111,18 @@
                                                :view-type view-type}
            :contentContainerStyle             style/flat-list-container}])])))
 
+(defn other-communities-list
+  [{:keys [communities view-type]}]
+  [rn/view style/other-communities-container
+   [rn/flat-list
+    {:key-fn                       :id
+     :keyboard-should-persist-taps :always
+     :separator                    [rn/view {:height 16}]
+     :data                         communities
+     :render-fn                    community-list-item
+     :contentContainerStyle        style/flat-list-container
+     :render-data                  {:view-type view-type}}]])
+
 (defn discover-communities-header
   [{:keys [featured-communities-count
            featured-communities
@@ -119,22 +132,9 @@
    [screen-title]
    [featured-communities-header featured-communities-count]
    [featured-list featured-communities view-type]
-   [quo/separator]
+   [rn/view {:style {:margin-horizontal 20}}
+    [quo/separator]]
    [discover-communities-segments selected-tab false]])
-
-(defn other-communities-list
-  [{:keys [communities communities-ids view-type]}]
-  [rn/view {:style style/other-communities-container}
-   [rn/flat-list
-    {:key-fn                            :id
-     :keyboard-should-persist-taps      :always
-     :shows-horizontal-scroll-indicator false
-     :separator                         [rn/view {:height 16}]
-     :data                              (if communities
-                                          communities
-                                          communities-ids)
-     :render-fn                         community-list-item
-     :render-data                       {:view-type view-type}}]])
 
 (defn communities-lists
   [selected-tab view-type]

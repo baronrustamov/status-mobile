@@ -16,8 +16,7 @@
                  :height        230
                  :border-radius 20}
       :on-press on-press}
-     [rn/view
-      {:flex 1}
+     [rn/view {:flex 1}
       [rn/view (style/community-cover-container 60)
        [rn/image
         {:source cover
@@ -37,7 +36,8 @@
         {:title       name
          :description description}]
        [rn/view {:style (style/card-stats-position)}
-        [community-view/community-stats-column :card-view]]
+        [community-view/community-stats-column
+         {:type :card-view}]]
        [rn/view {:style (style/community-tags-position)}
         [community-view/community-tags tags]]]]]]])
 
