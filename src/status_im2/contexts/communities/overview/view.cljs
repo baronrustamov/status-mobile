@@ -69,7 +69,7 @@
 (defn channel-list-component
   [{:keys [on-categories-heights-changed
            on-first-channel-height-changed]}
-   channels-list]
+   channels-list muted-community?]
   (let [categories-heights (reagent/atom [])]
     [rn/view
      {:on-layout #(on-first-channel-height-changed (+ (if platform/ios?
@@ -97,7 +97,7 @@
                  [rn/view
                   {:key        (:id channel)
                    :margin-top 4}
-                  [quo/channel-list-item channel]])
+                  [quo/channel-list-item channel muted-community?]])
                channels-for-category)]])
       channels-list)]))
 
@@ -209,7 +209,7 @@
    description])
 
 (defn community-content
-  [{:keys [name description locked joined images
+  [{:keys [name description locked joined images muted
            status tokens tags requested-to-join-at id]
     :as   community}
    {:keys [on-categories-heights-changed
@@ -217,7 +217,8 @@
   (let [pending?          (pos? requested-to-join-at)
         thumbnail-image   (get-in images [:thumbnail])
         chats-by-category (rf/sub [:communities/categorized-channels id])
-        users             (rf/sub [:communities/users id])]
+        users             (rf/sub [:communities/users id])
+        muted-community?  muted]
     [rn/view
      [rn/view {:padding-horizontal 20}
       (when (and (not joined)
@@ -257,7 +258,8 @@
      [channel-list-component
       {:on-categories-heights-changed   #(on-categories-heights-changed %)
        :on-first-channel-height-changed #(on-first-channel-height-changed %)}
-      (add-on-press-handler-to-categorized-chats id chats-by-category)]]))
+      (add-on-press-handler-to-categorized-chats id chats-by-category)
+      muted-community?]]))
 
 (defn sticky-category-header
   [_]
