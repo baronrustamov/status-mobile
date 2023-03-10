@@ -97,7 +97,7 @@
    :padding-top 4
    :padding-bottom 8
    :font-weight :500
-   :font-size 15
+   :font-size 10
    :max-width max-width})
 
 (def emoji-share-button-container

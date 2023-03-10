@@ -65,16 +65,13 @@
                                 :margin-right  4}}
              ]
          ]
-
-
         [rn/view {:style style/profile-address-container}
          [rn/view {:style style/profile-address-column}
           [quo/text
            {:size :paragraph-2
             :weight :medium
             :style style/profile-address-label}
-            (i18n/label :t/link-to-profile)
-           ]
+            (i18n/label :t/link-to-profile)]
           [copyable-text/copyable-text-view {:copied-text profile-qr-url
                                              :container-style style/copyable-text-container-style}
            [rn/text {:style (style/profile-address-content (* window-width 0.7))
@@ -92,9 +89,7 @@
             :style               style/header-button
             ;;:on-press           ;;;; TODO(siddarthay) : figure this out and take appropriate action
             }
-           :i/share]
-          ]
-         ]]
+           :i/share]]]]
 
        [rn/view {:style style/emoji-hash-container}
          [rn/view {:style style/profile-address-container}
@@ -104,8 +99,7 @@
                       :style style/emoji-hash-label}
             (i18n/label :t/emoji-hash)]
            [copyable-text/copyable-text-view {:copied-text emoji-hash :container-style style/copyable-text-container-style}
-            [rn/view {:style (style/set-custom-width (* window-width 0.87))}
-             [rn/text {:style (style/emoji-hash-content (* window-width 0.72))} emoji-hash]
+             [rn/text {:style (style/emoji-hash-content (* window-width 0.7))} emoji-hash]
              [rn/view
               [quo/button
                {:icon                true
@@ -116,12 +110,8 @@
                 :style               style/header-button
                 ;;:on-press           ;;;; TODO(siddarthay) : probably do nothing here? idk
                 }
-               :i/copy]
-              ]
-             ]]]]]
+               :i/share]]]]]]
        ]))
-
-
 
 (defn wallet-tab [window-width]
   [:<>
