@@ -21,6 +21,7 @@
     [status-im2.contexts.onboarding.new-to-status.view :as new-to-status]
     [status-im2.contexts.onboarding.sign-in.view :as sign-in]
     [status-im2.contexts.onboarding.syncing.syncing-devices.view :as syncing-devices]
+    [status-im2.contexts.onboarding.sign-in.sign-in-by-syncing.view :as sign-in-by-syncing]
     [status-im2.contexts.onboarding.profiles.view :as profiles]
     [status-im2.contexts.quo-preview.main :as quo.preview]
     [status-im2.contexts.shell.view :as shell]
@@ -116,6 +117,13 @@
     {:name      :profiles
      :insets    {:top false}
      :component profiles/views}
+
+    {:name      :sign-in-by-syncing
+     :options   {:statusBar     {:style :light}
+                 :topBar        {:visible false}
+                 :navigationBar {:backgroundColor colors/black}}
+     :insets    {:top false}
+     :component sign-in-by-syncing/view}
 
     ;; Onboarding - new to Status
     {:name      :new-to-status
