@@ -11,7 +11,8 @@
             [utils.i18n :as i18n]
             [status-im.utils.utils :as utils]
             [taoensso.timbre :as log]
-            [status-im.ui.screens.chat.components.input :as input]))
+            [status-im.ui.screens.chat.components.input :as input]
+            [status-im.native-module.mention :as mention]))
 
 (defn text->emoji
   "Replaces emojis in a specified `text`"
@@ -41,15 +42,15 @@
 
 (rf/defn select-mention
   {:events [:chat.ui/select-mention]}
-  [{:keys [db] :as cofx} text-input-ref {:keys [primary-name searched-text match] :as user}]
+  [{:keys [db] :as cofx} text-input-ref {:keys [primary-name searched-text match public-key] :as user}]
   (let [chat-id     (:current-chat-id db)
-        new-text    (mentions/new-input-text-with-mention cofx user)
+        text        (get-in db [:chat/inputs chat-id :input-text])
+        new-text    (mention/new-input-text-with-mentions chat-id text primary-name)
         at-sign-idx (get-in db [:chats/mentions chat-id :mentions :at-sign-idx])
         cursor      (+ at-sign-idx (count primary-name) 2)]
     (rf/merge
      cofx
      {:db                   (-> db
-                                (assoc-in [:chats/cursor chat-id] cursor)
                                 (assoc-in [:chats/mention-suggestions chat-id] nil))
       :set-text-input-value [chat-id new-text text-input-ref]}
      (set-chat-input-text new-text chat-id)
@@ -70,7 +71,7 @@
          :previous-text searched-text
          :start         start
          :end           end}))
-     (mentions/recheck-at-idxs {primary-name user}))))
+     (mentions/recheck-at-idxs public-key))))
 
 (rf/defn disable-chat-cooldown
   "Turns off chat cooldown (protection against message spamming)"
@@ -180,8 +181,7 @@
     (rf/merge cofx
               {:set-text-input-value [current-chat-id ""]}
               (clean-input current-chat-id)
-              (mentions/clear-mentions)
-              (mentions/clear-cursor))))
+              (mentions/clear-mentions))))
 
 (rf/defn send-messages
   [{:keys [db] :as cofx} input-text current-chat-id]
@@ -249,13 +249,11 @@
   [{{:keys [current-chat-id] :as db} :db :as cofx}]
   (let [{:keys [input-text metadata]} (get-in db [:chat/inputs current-chat-id])
         editing-message               (:editing-message metadata)
-        input-text-with-mentions      (mentions/check-mentions cofx input-text)]
+        input-text-with-mentions      (mention/check-mentions current-chat-id input-text)]
     (rf/merge cofx
               (if editing-message
                 (send-edited-message input-text-with-mentions editing-message)
-                (send-messages input-text-with-mentions current-chat-id))
-              (mentions/clear-mentions)
-              (mentions/clear-cursor))))
+                (send-messages input-text-with-mentions current-chat-id)))))
 
 (rf/defn send-contact-request
   {:events [:contacts/send-contact-request]}
@@ -269,7 +267,6 @@
                                          :on-error    #(log/warn "failed to send a contact request" %)
                                          :on-success  #(re-frame/dispatch [:transport/message-sent %])}]}
             (mentions/clear-mentions)
-            (mentions/clear-cursor)
             (clean-input (:current-chat-id db))))
 
 (rf/defn cancel-contact-request
@@ -280,7 +277,6 @@
     (rf/merge cofx
               {:db (assoc-in db [:chat/inputs current-chat-id :metadata :sending-contact-request] nil)}
               (mentions/clear-mentions)
-              (mentions/clear-cursor)
               (clean-input (:current-chat-id db)))))
 
 (rf/defn chat-send-sticker

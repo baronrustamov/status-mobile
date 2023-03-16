@@ -1,5 +1,6 @@
 (ns status-im.native-module.core
   (:require ["react-native" :as react-native]
+            [clojure.set :as set]
             [re-frame.core :as re-frame]
             [status-im2.utils.validators :as validators]
             [status-im.utils.platform :as platform]
@@ -611,3 +612,54 @@
                             current-password#
                             new-password
                             callback))
+
+(defn transfer-input-segments
+  [segments]
+  (map (fn [segment]
+         (let [type  (case (get segment "Type")
+                       0 :text
+                       1 :mention)
+               value (get segment "Value")]
+           [type value]))
+       segments))
+
+(defn transfer-mention-result
+  [result]
+  (let [{:keys [input-segments mentionable-users state]} (-> result
+                                                             (types/json->clj)
+                                                             (set/rename-keys
+                                                              {:InputSegments      :input-segments
+                                                               :MentionSuggestions :mentionable-users
+                                                               :MentionState       :state
+                                                               :ChatID             :chat-id}))
+        input-segments                                   (transfer-input-segments input-segments)
+        state                                            (set/rename-keys state
+                                                                          {:AtSignIdx    :at-sign-idx
+                                                                           :AtIdxs       :at-idxs
+                                                                           :MentionEnd   :mention-end
+                                                                           :PreviousText :previous-text
+                                                                           :NewText      :new-text
+                                                                           :Start        :start
+                                                                           :End          :end})
+        {:keys [at-idxs]}                                state
+        at-idxs                                          (map #(set/rename-keys %
+                                                                                {:From :from
+                                                                                 :To :to
+                                                                                 :Checked :checked?
+                                                                                 :Mentioned :mention?
+                                                                                 :Mention :mention
+                                                                                 :NextAtIdx
+                                                                                 :next-at-idx})
+                                                              at-idxs)
+        state                                            (assoc state :at-idxs at-idxs)]
+    {:chat-id           chat-id
+     :input-segments    input-segments
+     :mentionable-users mentionable-users
+     :state             state}
+  ))
+(defn mention-to-input-field
+  [chat-id text]
+  (log/debug "[native-module] mention-to-input-field" {:chat-id chat-id :text text})
+  (.mentionToInputField ^js (status) chat-id text))
+
+

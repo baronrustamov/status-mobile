@@ -439,26 +439,6 @@
    (group-chat/member-removed? current-chat pk)))
 
 (re-frame/reg-sub
- :chats/mentionable-users
- :<- [:chats/current-chat]
- :<- [:contacts/blocked-set]
- :<- [:contacts/contacts]
- :<- [:multiaccount]
- :<- [:communities/current-community-members]
- (fn
-   [[{:keys [users] :as chat}
-     blocked
-     all-contacts
-     {:keys [public-key] :as current-multiaccount}
-     community-members]]
-   (let [mentionable-users (mentions/get-mentionable-users chat
-                                                           all-contacts
-                                                           current-multiaccount
-                                                           community-members)
-         members-left      (into #{} (filter #(group-chat/member-removed? chat %) (keys users)))]
-     (apply dissoc mentionable-users (conj (concat blocked members-left) public-key)))))
-
-(re-frame/reg-sub
  :chat/mention-suggestions
  :<- [:chats/current-chat-id]
  :<- [:chats/mention-suggestions]

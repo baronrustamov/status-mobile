@@ -93,7 +93,7 @@
   (rf/dispatch [:chat.ui/set-chat-input-text val]))
 
 (defn on-selection-change
-  [timeout-id last-text-change mentionable-users args]
+  [timeout-id last-text-change args]
   (let [selection (.-selection ^js (.-nativeEvent ^js args))
         start     (.-start selection)
         end       (.-end selection)]
@@ -106,8 +106,7 @@
         (background-timer/set-timeout
          #(rf/dispatch [::mentions/on-selection-change
                         {:start start
-                         :end   end}
-                        mentionable-users])
+                         :end   end}])
          50)))
     ;; NOTE(rasom): on Android we dispatch event only in case if there
     ;; was no text changes during last 50ms. `on-selection-change` is
@@ -118,11 +117,10 @@
                    (< 50 (- (js/Date.now) @last-text-change))))
       (rf/dispatch [::mentions/on-selection-change
                     {:start start
-                     :end   end}
-                    mentionable-users]))))
+                     :end   end}]))))
 
 (defn on-change
-  [last-text-change timeout-id mentionable-users refs chat-id sending-image args]
+  [last-text-change timeout-id refs chat-id sending-image args]
   (let [text      (.-text ^js (.-nativeEvent ^js args))
         prev-text (get @input-texts chat-id)]
     (when (and (seq prev-text) (empty? text) (not sending-image))
@@ -147,10 +145,10 @@
     ;; NOTE(rasom): on iOS `on-change` is dispatched after `on-text-input`,
     ;; that's why mention suggestions are calculated on `on-change`
     (when platform/ios?
-      (rf/dispatch [::mentions/calculate-suggestions mentionable-users]))))
+      (rf/dispatch [::mentions/calculate-suggestions]))))
 
 (defn on-text-input
-  [mentionable-users chat-id args]
+  [chat-id args]
   (let [native-event  (.-nativeEvent ^js args)
         text          (.-text ^js native-event)
         previous-text (.-previousText ^js native-event)
@@ -170,7 +168,7 @@
     ;; `on-change`, that's why mention suggestions are calculated
     ;; on `on-change`
     (when platform/android?
-      (rf/dispatch [::mentions/calculate-suggestions mentionable-users]))))
+      (rf/dispatch [::mentions/calculate-suggestions]))))
 
 (defn text-input-style
   [chat-id]
@@ -193,7 +191,6 @@
 (defn text-input
   [{:keys [refs chat-id sending-image on-content-size-change]}]
   (let [cooldown-enabled? (rf/sub [:chats/current-chat-cooldown-enabled?])
-        mentionable-users (rf/sub [:chats/mentionable-users])
         timeout-id (reagent/atom nil)
         last-text-change (reagent/atom nil)
         mentions-enabled? (get @mentions-enabled? chat-id)
@@ -220,11 +217,10 @@
          :on-content-size-change on-content-size-change
          :on-selection-change (partial on-selection-change
                                        timeout-id
-                                       last-text-change
-                                       mentionable-users)
+                                       last-text-change)
          :on-change
-         (partial on-change last-text-change timeout-id mentionable-users refs chat-id sending-image)
-         :on-text-input (partial on-text-input mentionable-users chat-id)}
+         (partial on-change last-text-change timeout-id refs chat-id sending-image)
+         :on-text-input (partial on-text-input chat-id)}
         input-with-mentions (rf/sub [:chat/input-with-mentions])
         children (fn []
                    (if mentions-enabled?
