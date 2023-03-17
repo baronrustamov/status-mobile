@@ -13,7 +13,6 @@
             [status-im2.common.resources :as resources]
             [status-im2.constants :as constants]
             [status-im2.contexts.onboarding.sign-in.sign-in-by-syncing.style :as style]
-            [taoensso.timbre :as log]
             [utils.i18n :as i18n]
             [utils.re-frame :as rf]))
 
@@ -155,15 +154,15 @@
     (string/trim data)))
 
 
-;; (defn- check-qr-code-data
-;;   [event]
-;;   (when-let [data (get-qr-code-data event)]
-;;     (if (string/starts-with? data constants/local-pairing-connection-string-identifier)
-;;       (rf/dispatch [:syncing/input-connection-string-for-bootstrapping data])
-;;       (rf/dispatch [:toasts/upsert
-;;                     {:icon       :info
-;;                      :icon-color colors/danger-50
-;;                      :text       "Oops! This is not a sync QR code"}]))))
+(defn- check-qr-code-data
+  [event]
+  (when-let [data (get-qr-code-data event)]
+    (if (string/starts-with? data constants/local-pairing-connection-string-identifier)
+      (rf/dispatch [:syncing/input-connection-string-for-bootstrapping data])
+      (rf/dispatch [:toasts/upsert
+                    {:icon       :info
+                     :icon-color colors/danger-50
+                     :text       "Oops! This is not a sync QR code"}]))))
 
 (defn view
   []
@@ -184,8 +183,7 @@
              on-read-code              (fn [data]
                                          (when-not @read-qr-once?
                                            (reset! read-qr-once? true)
-                                           (log/info "DATA:" (get-qr-code-data data))
-                                         ))
+                                           (check-qr-code-data data)))
              request-camera-permission (fn []
                                          (rf/dispatch
                                           [:request-permissions
