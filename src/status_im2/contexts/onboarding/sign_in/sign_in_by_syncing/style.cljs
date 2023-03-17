@@ -30,13 +30,28 @@
   {:padding-horizontal screen-padding
    :margin-top         20})
 
+(def qr-view-finder
+  {:margin-horizontal screen-padding
+   :height            1
+   :display           :flex})
+
+(defn viewfinder-container
+  [viewfinder]
+  {:position :absolute
+   :left     (:x viewfinder)
+   :top      (:y viewfinder)})
+
+(def viewfinder-text
+  {:color       colors/white-opa-70
+   :text-align  :center
+   :padding-top 16})
+
 (def camera-permission-container
   {:height            335
    :margin-horizontal screen-padding
    :background-color  colors/white-opa-5
    :border-color      colors/white-opa-10
    :border-radius     12
-   :margin-top        20
    :align-items       :center
    :justify-content   :center})
 

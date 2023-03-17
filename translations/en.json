@@ -2010,5 +2010,6 @@
     "to-scan-a-qr-enable-your-camera": "To scan a QR, enable your camera",
     "enable-camera": "Enable camera",
     "ensure-qr-code-in-focus-to-scan": "Ensure that the QR code is in focus to scan",
-    "i-dont-have-status-on-another-device": "I don’t have Status on another device"
+    "i-dont-have-status-on-another-device": "I don’t have Status on another device",
+    "ensure-qr-code-is-in-focus-to-scan":"Ensure that the QR code is in focus to scan"
 }
