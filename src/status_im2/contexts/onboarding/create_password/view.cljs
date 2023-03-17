@@ -64,7 +64,7 @@
           error?        (and @show-hint-2?
                              (not passwords-match?)
                              (not empty-password?))]
-      [rn/view
+      [:<>
        [password-with-hint
         {:hint           {:text   (i18n/label :t/password-creation-hint)
                           :status hint-1-status
