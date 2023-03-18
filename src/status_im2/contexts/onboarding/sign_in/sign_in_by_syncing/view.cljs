@@ -8,6 +8,7 @@
             [react-native.core :as rn]
             [react-native.hole-view :as hole-view]
             [react-native.permissions :as permissions]
+            [react-native.platform :as platform]
             [react-native.safe-area :as safe-area]
             [reagent.core :as reagent]
             [status-im2.common.resources :as resources]
@@ -85,7 +86,7 @@
     (i18n/label :t/enable-camera)]])
 
 
-(defn- calculate-qr-scan-hola-area
+(defn- calculate-qr-scan-hole-area
   [qr-view-finder]
   [rn/view
    {:style     style/qr-view-finder
@@ -122,7 +123,7 @@
   [qr-view-finder camera-permission-granted? request-camera-permission]
   [:<>
    [rn/view {:style {:margin-top 20}}]
-   [calculate-qr-scan-hola-area qr-view-finder]
+   [calculate-qr-scan-hole-area qr-view-finder]
    (if @camera-permission-granted?
      [viewfinder @qr-view-finder]
      [enable-camera-access-view request-camera-permission])])
@@ -148,21 +149,15 @@
       :style  style/bottom-text}
      (i18n/label :t/i-dont-have-status-on-another-device)]]])
 
-(defn- get-qr-code-data
-  [event]
-  (when-let [data (oops/oget event "nativeEvent.codeStringValue")]
-    (string/trim data)))
-
-
 (defn- check-qr-code-data
   [event]
-  (when-let [data (get-qr-code-data event)]
+  (when-let [data (string/trim (oops/oget event "nativeEvent.codeStringValue"))]
     (if (string/starts-with? data constants/local-pairing-connection-string-identifier)
       (rf/dispatch [:syncing/input-connection-string-for-bootstrapping data])
       (rf/dispatch [:toasts/upsert
                     {:icon       :info
                      :icon-color colors/danger-50
-                     :text       "Oops! This is not a sync QR code"}]))))
+                     :text       (i18n/label :t/error-this-is-not-a-sync-qr-code)}]))))
 
 (defn view
   []
@@ -219,7 +214,7 @@
             {:style         style/absolute-fill
              :overlay-color colors/neutral-80-opa-80
              :blur-type     :dark
-             :blur-amount   15}]]
+             :blur-amount   (if platform/ios? 15 5)}]]
           [header active-tab read-qr-once?]
           (case @active-tab
             1 [scan-qr-code-tab qr-view-finder camera-permission-granted? request-camera-permission]
