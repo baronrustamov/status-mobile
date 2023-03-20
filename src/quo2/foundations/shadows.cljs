@@ -6,9 +6,9 @@
   [inverted? number]
   (if inverted? (* -1 number) number))
 
-(defn- get-scales
-  [inverted?]
-  (if (theme/dark?)
+(defn get-scales
+  [inverted? override-theme]
+  (if (or override-theme (theme/dark?))
     {:shadow-1 {:shadow-color   (colors/alpha colors/neutral-100 0.5)
                 :shadow-offset  {:width  0
                                  :height (get-inverted inverted? 4)}
@@ -58,9 +58,9 @@
                 :shadow-radius  16
                 :elevation      13}}))
 
-(def normal-scale (get-scales false))
+(def normal-scale (get-scales false nil))
 
-(def inverted-scale (get-scales true))
+(def inverted-scale (get-scales true nil))
 
 (def inner-shadow
   {:shadow-color   (colors/alpha colors/neutral-100 0.08)

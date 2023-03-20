@@ -32,7 +32,7 @@
       (let [{:keys [group-chat chat-id public-key color name]} context
             id (or chat-id public-key)
             display-name
-            (if-not group-chat (first (rf/sub [:contacts/contact-two-names-by-identity id])) name)
+            (or name (when-not group-chat (first (rf/sub [:contacts/contact-two-names-by-identity id]))))
             contact (when-not group-chat
                       (rf/sub [:contacts/contact-by-address
                                id]))
