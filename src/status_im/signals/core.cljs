@@ -9,7 +9,8 @@
             [status-im.visibility-status-updates.core :as visibility-status-updates]
             [utils.re-frame :as rf]
             [status-im2.contexts.chat.messages.link-preview.events :as link-preview]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log]
+            [status-im2.constants :as constants]))
 
 (rf/defn status-node-started
   [{db :db :as cofx} {:keys [error]}]
@@ -54,9 +55,15 @@
                 :peers-count (count (:peers peer-stats)))}))
 
 (defn handle-local-pairing-signals
-  [event]
-  (log/debug "local pairing signal received"
-             {:event event}))
+  [{:keys [db]} event]
+  (log/info "local pairing signal received"
+            {:event event})
+  (when (= (:type event) constants/local-pairing-event-connection-success)
+    {:db (assoc db :local-pairing/completed-pairing? false)})
+  (when (and (= (:type event) constants/local-pairing-event-transfer-success)
+             (= (:action event) constants/local-pairing-action-pairing-installation))
+    {:db       (assoc db :local-pairing/completed-pairing? true)
+     :dispatch [:navigate-to :enable-notifications]}))
 
 (rf/defn process
   {:events [:signals/signal-received]}
@@ -110,5 +117,6 @@
       "status.updates.timedout" (visibility-status-updates/handle-visibility-status-updates
                                  cofx
                                  (js->clj event-js :keywordize-keys true))
-      "localPairing"            (handle-local-pairing-signals (js->clj event-js :keywordize-keys true))
+      "localPairing"            (handle-local-pairing-signals cofx
+                                                              (js->clj event-js :keywordize-keys true))
       (log/debug "Event " type " not handled"))))

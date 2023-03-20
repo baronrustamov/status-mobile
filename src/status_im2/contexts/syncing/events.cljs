@@ -24,7 +24,7 @@
 (rf/defn initiate-local-pairing-with-connection-string
   {:events       [:syncing/input-connection-string-for-bootstrapping]
    :interceptors [(re-frame/inject-cofx :random-guid-generator)]}
-  [{:keys [random-guid-generator db]} {connection-string :data}]
+  [{:keys [random-guid-generator db]} connection-string]
   (let [installation-id (random-guid-generator)
         default-node-config (get-default-node-config installation-id)
         default-node-config-string (.stringify js/JSON (clj->js default-node-config))

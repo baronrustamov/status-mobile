@@ -260,6 +260,14 @@
   An example of a connection string is -> cs2:5vd6J6:Jfc:27xMmHKEYwzRGXcvTtuiLZFfXscMx4Mz8d9wEHUxDj4p7:EG7Z13QScfWBJNJ5cprszzDQ5fBVsYMirXo8MaQFJvpF:3 "
   "cs")
 
+(def ^:const local-pairing-event-connection-success "connection-success")
+(def ^:const local-pairing-event-transfer-success "transfer-success")
+
+(def ^:const local-pairing-action-connect 1)
+(def ^:const local-pairing-action-pairing-account 2)
+(def ^:const local-pairing-action-sync-device 3)
+(def ^:const local-pairing-action-pairing-installation 4)
+
 (def ^:const serialization-key
   "We pass this serialization key as a parameter to MultiformatSerializePublicKey
   function at status-go, This key determines the output base of the serialization.
