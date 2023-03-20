@@ -17,7 +17,7 @@
   (hide-sheet-and-dispatch [:chat.ui/mute chat-id false]))
 
 (defn view-members
-  [id]
+  [_id]
   {:icon                :i/members
    :accessibility-label :view-members
    :label               (i18n/label :t/view-channel-members-and-details)})
@@ -32,7 +32,7 @@
    :label               (i18n/label :t/view-token-gating)})
 
 (defn mark-as-read
-  [id]
+  [_id]
   {:icon                :i/up-to-date
    :accessibility-label :mark-as-read
    :label               (i18n/label :t/mark-as-read)
@@ -75,7 +75,7 @@
    :label               (i18n/label :t/show-qr)})
 
 (defn share-channel
-  [id]
+  [_id]
   {:icon                :i/share
    :accessibility-label :share-channel
    :label               (i18n/label :t/share-channel)
