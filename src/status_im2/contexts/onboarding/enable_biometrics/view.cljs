@@ -46,8 +46,6 @@
        (i18n/label :t/biometric-enable-button {:bio-type-label bio-type-label})]
       [quo/button
        {:on-press                  #(rf/dispatch [:navigate-to :enable-notifications])
-        :type                      :grey
-        :override-theme            :dark
         :override-background-color colors/white-opa-5
         :style                     {:margin-top 12}}
        (i18n/label :t/maybe-later)]]]]))
