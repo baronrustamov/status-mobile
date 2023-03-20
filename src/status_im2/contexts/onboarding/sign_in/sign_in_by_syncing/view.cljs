@@ -122,7 +122,7 @@
 (defn- scan-qr-code-tab
   [qr-view-finder camera-permission-granted? request-camera-permission]
   [:<>
-   [rn/view {:style {:margin-top 20}}]
+   [rn/view {:style style/scan-qr-code-container}]
    [calculate-qr-scan-hole-area qr-view-finder]
    (if @camera-permission-granted?
      [viewfinder @qr-view-finder]

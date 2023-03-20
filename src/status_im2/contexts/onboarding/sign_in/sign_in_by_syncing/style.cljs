@@ -30,6 +30,9 @@
   {:padding-horizontal screen-padding
    :margin-top         20})
 
+(def scan-qr-code-container
+  {:margin-top 19})
+
 (def qr-view-finder
   {:margin-horizontal screen-padding
    :height            1
