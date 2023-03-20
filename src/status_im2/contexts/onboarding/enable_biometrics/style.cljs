@@ -18,5 +18,6 @@
    :margin-bottom    24
    :background-color colors/danger-50
    :border-radius    20
+   :flex             1
    :align-items      :center
    :justify-content  :center})
