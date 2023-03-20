@@ -292,7 +292,7 @@
       {:on-category-layout              on-category-layout
        :community-id                    id
        :on-first-channel-height-changed on-first-channel-height-changed}
-      (add-handlers-to-chats id chats-by-category)]]))
+      (add-handlers-to-categorized-chats id chats-by-category)]]))
 
 (defn sticky-category-header
   [_]
