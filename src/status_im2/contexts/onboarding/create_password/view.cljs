@@ -7,7 +7,8 @@
     [status-im2.contexts.onboarding.common.navigation-bar.view :refer [navigation-bar]]
     [status-im2.contexts.onboarding.create-password.style :as style]
     [utils.i18n :as i18n]
-    [utils.re-frame :as rf]))
+    [utils.re-frame :as rf]
+    [utils.string :as utils.string]))
 
 (defn background-image
   []
@@ -109,18 +110,16 @@
     [quo/tips {:completed? symbols?}
      (i18n/label :t/password-creation-tips-4)]]])
 
-(defn has-lower-case [s] (re-find #"[a-z]" s))
-(defn has-upper-case [s] (re-find #"[A-Z]" s))
-(defn has-numbers [s] (re-find #"\d" s))
-(defn has-symbols [s] (re-find #"[^a-zA-Z0-9\s]" s))
-(defn at-least-10-chars? [s] (>= (count s) 10))
-
 (defn password-validations
-  [s]
-  (->> s
-       ((juxt has-lower-case has-upper-case has-numbers has-symbols at-least-10-chars?))
-       (map boolean)
-       (zipmap [:lower-case? :upper-case? :numbers? :symbols? :long-enough?])))
+  [password]
+  (let [validations (juxt utils.string/has-lower-case?
+                          utils.string/has-upper-case?
+                          utils.string/has-numbers?
+                          utils.string/has-symbols?
+                          #(utils.string/at-least-n-chars? % 10))]
+    (->> password
+         (validations)
+         (zipmap [:lower-case? :upper-case? :numbers? :symbols? :long-enough?]))))
 
 (defn calc-password-strength
   [validations]
