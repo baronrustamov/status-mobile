@@ -4,7 +4,7 @@
     [react-native.core :as rn]
     [reagent.core :as reagent]
     [status-im2.common.resources :as resources]
-    [status-im2.contexts.onboarding.common.navigation-bar.view :refer [navigation-bar]]
+    [status-im2.contexts.onboarding.common.navigation-bar.view :as navigation-bar]
     [status-im2.contexts.onboarding.create-password.style :as style]
     [utils.i18n :as i18n]
     [utils.re-frame :as rf]
@@ -192,5 +192,5 @@
       {:ref                     #(reset! scroll-view-ref %)
        :style                   style/overlay
        :content-container-style style/content-style}
-      [navigation-bar {:on-press-info #(js/alert "Info pressed")}]
+      [navigation-bar/navigation-bar {:on-press-info #(js/alert "Info pressed")}]
       [password-form {:scroll-to-end-fn scroll-to-end-fn}]]]))
