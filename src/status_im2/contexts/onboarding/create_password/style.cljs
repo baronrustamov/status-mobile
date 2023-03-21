@@ -22,6 +22,7 @@
 (def label-container
   {:margin-top     8
    :flex-direction :row
+   :align-items    :center
    :height         16})
 
 (def label-icon
@@ -31,15 +32,17 @@
 
 (defn label-icon-color
   [status]
-  (status {:neutral colors/neutral-40
-           :success colors/success-60
-           :danger  colors/danger-60}))
+  (get {:neutral colors/neutral-40
+        :success colors/success-60
+        :danger  colors/danger-60}
+       status))
 
 (defn label-color
   [status]
-  {:color (status {:neutral colors/white-opa-70
-                   :success colors/success-60
-                   :danger  colors/danger-60})})
+  (let [colors {:neutral colors/white-opa-70
+                :success colors/success-60
+                :danger  colors/danger-60}]
+    {:color (get colors status)}))
 
 (def space-between-inputs {:height 16})
 
