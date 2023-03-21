@@ -6,7 +6,7 @@
     [status-im.multiaccounts.recover.core :as multiaccounts.recover]
     [status-im2.common.resources :as resources]
     [status-im2.contexts.onboarding.new-to-status.style :as style]
-    [status-im2.contexts.onboarding.common.navigation-bar.view :refer [navigation-bar]]
+    [status-im2.contexts.onboarding.common.navigation-bar.view :as navigation-bar]
     [utils.i18n :as i18n]
     [utils.re-frame :as rf]))
 
@@ -73,5 +73,5 @@
   [rn/view {:style style/full-screen}
    [background-image]
    [rn/view {:style style/layer-background}
-    [navigation-bar {:on-press-info #(js/alert "Info pressed")}]
+    [navigation-bar/navigation-bar {:on-press-info #(js/alert "Info pressed")}]
     [sign-in-options]]])
