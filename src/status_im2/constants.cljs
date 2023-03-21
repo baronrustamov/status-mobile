@@ -261,6 +261,7 @@
   "cs")
 
 (def ^:const local-pairing-event-connection-success "connection-success")
+(def ^:const local-pairing-event-process-success "process-success")
 (def ^:const local-pairing-event-transfer-success "transfer-success")
 
 (def ^:const local-pairing-action-connect 1)

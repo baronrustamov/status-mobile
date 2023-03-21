@@ -10,7 +10,8 @@
             [utils.re-frame :as rf]
             [status-im2.contexts.chat.messages.link-preview.events :as link-preview]
             [taoensso.timbre :as log]
-            [status-im2.constants :as constants]))
+            [status-im2.constants :as constants]
+            [status-im.multiaccounts.model :as multiaccounts.model]))
 
 (rf/defn status-node-started
   [{db :db :as cofx} {:keys [error]}]
@@ -55,12 +56,24 @@
                 :peers-count (count (:peers peer-stats)))}))
 
 (rf/defn handle-local-pairing-signals
-  [{:keys [db]} event]
+  [{:keys [db] :as cofx} event]
   (log/info "local pairing signal received"
             {:event event})
-  (let [completed-pairing? (and (= (:type event) constants/local-pairing-event-transfer-success)
-                                (= (:action event) constants/local-pairing-action-sync-device))]
-    {:db (assoc db :local-pairing/completed-pairing? completed-pairing?)}))
+  (let [connection-success?          (= (:type event) constants/local-pairing-event-connection-success)
+        completed-pairing?           (and (= (:type event) constants/local-pairing-event-process-success)
+                                          (= (:action event)
+                                             constants/local-pairing-action-pairing-account))
+        logged-in?                   (multiaccounts.model/logged-in? cofx)
+        navigate-to-syncing-devices? (and connection-success? (not logged-in?))]
+    (rf/merge cofx
+              {:db (cond-> db
+                     connection-success?
+                     (assoc :local-pairing/completed-pairing? false)
+
+                     completed-pairing?
+                     (assoc :local-pairing/completed-pairing? true))}
+              #(when navigate-to-syncing-devices?
+                 {:dispatch [:navigate-to :syncing-devices]}))))
 
 (rf/defn process
   {:events [:signals/signal-received]}
