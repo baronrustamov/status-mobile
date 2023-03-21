@@ -51,6 +51,7 @@
                                      :ensVerified   :ens-verified
                                      :added         :added?
                                      :displayName   :display-name
+                                     :searchedText  :searched-text
                                     })))
           {}
           mentionable-users))
