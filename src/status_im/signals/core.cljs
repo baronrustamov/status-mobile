@@ -54,16 +54,13 @@
                 :peer-stats  peer-stats
                 :peers-count (count (:peers peer-stats)))}))
 
-(defn handle-local-pairing-signals
+(rf/defn handle-local-pairing-signals
   [{:keys [db]} event]
   (log/info "local pairing signal received"
             {:event event})
-  (when (= (:type event) constants/local-pairing-event-connection-success)
-    {:db (assoc db :local-pairing/completed-pairing? false)})
-  (when (and (= (:type event) constants/local-pairing-event-transfer-success)
-             (= (:action event) constants/local-pairing-action-pairing-installation))
-    {:db       (assoc db :local-pairing/completed-pairing? true)
-     :dispatch [:navigate-to :enable-notifications]}))
+  (let [completed-pairing? (and (= (:type event) constants/local-pairing-event-transfer-success)
+                                (= (:action event) constants/local-pairing-action-sync-device))]
+    {:db (assoc db :local-pairing/completed-pairing? completed-pairing?)}))
 
 (rf/defn process
   {:events [:signals/signal-received]}

@@ -172,6 +172,7 @@
              show-holes?               (and @qr-view-finder
                                             (= @active-tab 1)
                                             @camera-permission-granted?)
+             holes                     (merge @qr-view-finder {:borderRadius 16})
              show-camera?              (and (= @active-tab 1) @camera-permission-granted?)
              camera-ref                (atom nil)
              read-qr-once?             (atom false)
@@ -208,8 +209,9 @@
               :source (resources/get-image :intro-4)}])
           [hole-view/hole-view
            {:style style/absolute-fill
-            :holes (when show-holes?
-                     [(merge @qr-view-finder {:borderRadius 16})])}
+            :holes (if show-holes?
+                     [holes]
+                     [])}
            [blur/view
             {:style         style/absolute-fill
              :overlay-color colors/neutral-80-opa-80
