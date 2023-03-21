@@ -53,9 +53,9 @@
 
 (defn password-inputs
   [{:keys [passwords-match? on-change-password on-change-repeat-password on-input-focus
-           password-long-enough? empty-password? same-password-lenght?]}]
+           password-long-enough? empty-password? same-password-length?]}]
   (reagent/with-let [show-hint-2? (reagent/atom false)]
-    (let [_ (when same-password-lenght? (reset! show-hint-2? true))
+    (let [_ (when same-password-length? (reset! show-hint-2? true))
           hint-1-status (if password-long-enough? :success :neutral)
           hint-2-status (if passwords-match? :success :danger)
           hint-2-text   (if passwords-match?
@@ -136,7 +136,7 @@
                                                         :focused-input       nil})
                      password            (reagent/cursor state [:password])
                      repeat-password     (reagent/cursor state [:repeat-password])
-                     accepts-discalimer? (reagent/cursor state [:accepts-disclaimer?])
+                     accepts-disclaimer? (reagent/cursor state [:accepts-disclaimer?])
                      focused-input       (reagent/cursor state [:focused-input])]
     (let [{:keys [long-enough?]
            :as   validations} (password-validations @password)
@@ -148,7 +148,7 @@
           meet-requirements?  (and (not empty-password?)
                                    (= password-strength 5)
                                    same-passwords?
-                                   @accepts-discalimer?)]
+                                   @accepts-disclaimer?)]
       [:<>
        [rn/view {:style style/top-part}
         [header]
@@ -156,7 +156,7 @@
          {:password-long-enough?     long-enough?
           :passwords-match?          same-passwords?
           :empty-password?           empty-password?
-          :same-password-lenght?     same-length?
+          :same-password-length?     same-length?
           :on-input-focus            (fn [input-id]
                                        (scroll-to-end-fn)
                                        (reset! focused-input input-id))
@@ -172,8 +172,8 @@
         (when (= @focused-input :repeat-password)
           [rn/view {:style style/disclaimer-container}
            [quo/disclaimer
-            {:on-change #(reset! accepts-discalimer? %)
-             :checked?  @accepts-discalimer?}
+            {:on-change #(reset! accepts-disclaimer? %)
+             :checked?  @accepts-disclaimer?}
             (i18n/label :t/password-creation-disclaimer)]])
 
         [rn/view {:style style/button-container}
