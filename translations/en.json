@@ -2000,5 +2000,11 @@
     "strength-divider-okay-label": "Okay",
     "strength-divider-strong-label": "Strong",
     "strength-divider-very-strong-label": "Very strong",
+    "sync-devices-succes-title": "Device sync complete!",
+    "sync-devices-succes-sub-title": "Your devices are now in sync",
+    "sync-devices-progress-title": "Syncing devices...",
+    "sync-devices-progress-sub-title": "Please keep both devices switched on and connected to the internet until sync is complete",
+    "sync-devices-error-title": "Oops, something’s wrong",
+    "sync-devices-error-sub-title":"Make sure both devices are powered on and connected to the internet.",
     "logged-in": "Logged in"
 }
