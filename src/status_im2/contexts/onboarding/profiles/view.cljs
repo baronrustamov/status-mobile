@@ -153,20 +153,19 @@
         :profile-picture     (when profile-picture {:uri profile-picture})
         :card-style          style/login-profile-card}]
       [quo/input
-       {:type                :password
-        :blur?               true
-        :override-theme      :dark
-        :placeholder         (i18n/label :t/type-your-password)
-        :accessibility-label :password-input
-        :auto-focus          true
-        :error?              (when (not-empty error) error)
-        :label               (i18n/label :t/profile-password)
-        :secure-text-entry   true
-        :on-change-text      (fn [password]
-                               (rf/dispatch [:set-in [:multiaccounts/login :password]
-                                             (security/mask-data password)])
-                               (rf/dispatch [:set-in [:multiaccounts/login :error] ""]))
-        :on-submit-editing   (when sign-in-enabled? login-multiaccount)}]
+       {:type              :password
+        :blur?             true
+        :override-theme    :dark
+        :placeholder       (i18n/label :t/type-your-password)
+        :auto-focus        true
+        :error?            (when (not-empty error) error)
+        :label             (i18n/label :t/profile-password)
+        :secure-text-entry true
+        :on-change-text    (fn [password]
+                             (rf/dispatch [:set-in [:multiaccounts/login :password]
+                                           (security/mask-data password)])
+                             (rf/dispatch [:set-in [:multiaccounts/login :error] ""]))
+        :on-submit-editing (when sign-in-enabled? login-multiaccount)}]
       (when (not-empty error)
         [quo/info-message
          {:type  :error

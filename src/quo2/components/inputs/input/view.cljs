@@ -57,7 +57,7 @@
    :label :char-limit :on-char-limit-reach :icon-name :multiline?])
 
 (defn- base-input
-  [{:keys [on-change-text on-char-limit-reach accessibility-label]}]
+  [{:keys [on-change-text on-char-limit-reach]}]
   (let [status              (reagent/atom :default)
         on-focus            #(reset! status :focus)
         on-blur             #(reset! status :default)
@@ -103,8 +103,6 @@
                     :cursor-color           (:cursor variant-colors)
                     :editable               (not disabled?)
                     :on-focus               on-focus
-                    :accessibility-label    accessibility-label
-                    :accessible             true
                     :on-blur                on-blur}
              :always    (merge clean-props)
              multiline? (assoc :multiline              true
