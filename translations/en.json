@@ -2012,5 +2012,6 @@
     "ensure-qr-code-in-focus-to-scan": "Ensure that the QR code is in focus to scan",
     "i-dont-have-status-on-another-device": "I don’t have Status on another device",
     "ensure-qr-code-is-in-focus-to-scan":"Ensure that the QR code is in focus to scan",
-    "error-this-is-not-a-sync-qr-code": "Oops! This is not a sync QR code"
+    "error-this-is-not-a-sync-qr-code": "Oops! This is not a sync QR code",
+    "camera-permission-denied": "Permission denied"
 }

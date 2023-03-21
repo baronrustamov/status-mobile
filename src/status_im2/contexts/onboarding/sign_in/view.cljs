@@ -61,8 +61,6 @@
                         (reset! active-tab id)
                         (reset! read-qr-once? false))}]]])
 
-
-
 (defn- enable-camera-access-view
   [request-camera-permission]
   [rn/view {:style style/camera-permission-container}
@@ -84,7 +82,6 @@
      :override-theme      :dark
      :on-press            request-camera-permission}
     (i18n/label :t/enable-camera)]])
-
 
 (defn- calculate-qr-scan-hole-area
   [qr-view-finder]
@@ -142,7 +139,7 @@
   [rn/touchable-without-feedback
    {:on-press #(js/alert "Yet to be implemented")}
    [rn/view
-    {:style (style/bottom-container insets)}
+    {:style (style/bottom-container (:bottom insets))}
     [quo/text
      {:size   :paragraph-2
       :weight :regular
@@ -185,18 +182,18 @@
                                           [:request-permissions
                                            {:permissions [:camera]
                                             :on-allowed  #(reset! camera-permission-granted? true)
-                                            ;; TODO: Check with the design team for unhappy flow
                                             :on-denied   #(rf/dispatch
                                                            [:toasts/upsert
-                                                            {:icon       :info
+                                                            {:icon :info
                                                              :icon-color colors/danger-50
-                                                             :text       "Permission denied"}])}]))]
+                                                             :text (i18n/label
+                                                                    :t/camera-permission-denied)}])}]))]
          (rn/use-effect
           (fn []
             (permissions/permission-granted? :camera
                                              #(reset! camera-permission-granted? %)
                                              #(reset! camera-permission-granted? false))))
-         [rn/view {:style {:flex 1 :padding-top (:top insets)}}
+         [rn/view {:style (style/root-container (:top insets))}
           (if show-camera?
             [camera
              {:ref            #(reset! camera-ref %)

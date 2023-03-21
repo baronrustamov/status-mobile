@@ -12,6 +12,11 @@
    :left     0
    :right    0})
 
+(defn root-container
+  [padding-top]
+  {:flex        1
+   :padding-top padding-top})
+
 (def header-container
   {:flex-direction     :row
    :justify-content    :space-between
@@ -73,9 +78,9 @@
    :align-items     :center})
 
 (defn bottom-container
-  [insets]
+  [padding-bottom]
   {:padding-top             12
-   :padding-bottom          (:bottom insets)
+   :padding-bottom          padding-bottom
    :background-color        colors/white-opa-5
    :border-top-left-radius  20
    :border-top-right-radius 20

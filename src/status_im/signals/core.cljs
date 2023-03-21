@@ -64,6 +64,8 @@
                                           (= (:action event)
                                              constants/local-pairing-action-pairing-account))
         logged-in?                   (multiaccounts.model/logged-in? cofx)
+        ;; since `connection-success` event is received on both sender and receiver devices
+        ;; we check the `logged-in?` status to identify the receiver and take the user to next screen
         navigate-to-syncing-devices? (and connection-success? (not logged-in?))]
     (rf/merge cofx
               {:db (cond-> db
