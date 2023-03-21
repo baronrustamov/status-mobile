@@ -1,12 +1,11 @@
 (ns status-im2.contexts.onboarding.common.navigation-bar.view
   (:require [quo2.core :as quo]
             [react-native.core :as rn]
-            [status-im2.contexts.onboarding.common.navigation-bar.style :as style]
             [utils.re-frame :as rf]))
 
 (defn navigation-bar
   [{:keys [on-press-info]}]
-  [rn/view {:style style/navigation-bar}
+  [rn/view {:style {:height 56}}
    [quo/page-nav
     {:align-mid?            true
      :mid-section           {:type :text-only}
