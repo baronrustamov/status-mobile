@@ -476,13 +476,6 @@
         keychain/auth-method-biometric
         keychain/auth-method-password))))
 
-(rf/defn local-pairing-completed
-  {:events [:local-pairing/completed]}
-  [{:keys [db] :as cofx}]
-  (rf/merge cofx
-            {:db       (dissoc db :local-pairing/completed-pairing?)
-             :dispatch [:init-root :enable-notifications]}))
-
 (defn redirect-to-root
   "Decides which root should be initialised depending on user and app state"
   [db]
@@ -490,7 +483,7 @@
         completed-local-pairing? (get db :local-pairing/completed-pairing?)]
     (if tos-accepted?
       (if completed-local-pairing?
-        (re-frame/dispatch [:local-pairing/completed])
+        (re-frame/dispatch [:syncing/pairing-completed])
         (re-frame/dispatch [:init-root :shell-stack]))
       (re-frame/dispatch [:init-root :tos]))))
 
