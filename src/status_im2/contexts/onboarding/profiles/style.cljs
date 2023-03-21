@@ -1,7 +1,6 @@
 (ns status-im2.contexts.onboarding.profiles.style
   (:require [quo2.foundations.colors :as colors]
-            [react-native.platform :as platform]
-            [quo2.foundations.shadows :as shadows]))
+            [react-native.platform :as platform]))
 
 ;; Profiles Section
 
@@ -9,10 +8,10 @@
   [last-item?]
   ;; This part needs to be improved, inverted shadow is not supported in android
   ;; https://reactnative.dev/docs/shadow-props#shadowoffset-ios
-  (merge
-   (:shadow-1 (shadows/get-scales true :dark))
-   {:padding-horizontal 20
-    :margin-bottom      (when-not last-item? -24)}))
+  ;; (merge
+  ;;  (:shadow-1 (shadows/get-scales true :dark))
+  {:padding-horizontal 20
+   :margin-bottom      (when-not last-item? -24)})
 
 (def profiles-container
   {:position :absolute

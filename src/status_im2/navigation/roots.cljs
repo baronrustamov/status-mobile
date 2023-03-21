@@ -6,6 +6,8 @@
 
 (defn status-bar-options
   []
+  ;; dark-mode? = After login we are going to use theme as per user's choice (colors/dark?)
+  ;; but before login we only have dark mode (dark-mode? = true)
   (let [dark-mode? (if (= @state/root-id :shell-stack) (colors/dark?) true)]
     (if platform/android?
       {:navigationBar {:backgroundColor colors/neutral-100}

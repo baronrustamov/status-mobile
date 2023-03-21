@@ -2006,7 +2006,7 @@
     "forget-password": "Forgot password?",
     "log-in": "Log in",
     "type-your-password": "Type your password",
-    "ops-wrong-password": "Ops! Wrong password",
+    "oops-wrong-password": "Oops, wrong password!",
     "remove-profile?" : "Remove profile?",
     "remove-profile-message": "Remove profile from this device",
     "remove-profile-confirm-message": "All profile data will removed from device.",

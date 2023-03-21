@@ -47,6 +47,7 @@
     :accessibility-label :remove-profile-confirm
     :context             context
     :button-text         (i18n/label :t/remove)
+    :close-button-text   (i18n/label :t/cancel)
     :on-press            #(do
                             (rf/dispatch [:bottom-sheet/hide])
                             (status/delete-multiaccount
@@ -89,7 +90,11 @@
       :show-options-button? true
       :profile-picture      (when profile-picture {:uri profile-picture})
       :card-style           (style/profiles-profile-card last-item?)
-      :on-options-press     #(show-profile-options key-uid {:name name :color customization-color})
+      :on-options-press     #(show-profile-options
+                              key-uid
+                              {:name            name
+                               :color           customization-color
+                               :profile-picture profile-picture})
       :on-card-press        #(do
                                (rf/dispatch
                                 [:multiaccounts.login.ui/multiaccount-selected key-uid])
@@ -117,7 +122,7 @@
         :override-theme      :dark}
        :main-icons/add]]
      [rn/flat-list
-      {:data                    multiaccounts
+      {:data                    (sort-by :timestamp > multiaccounts)
        :key-fn                  :key-uid
        :content-container-style {:padding-bottom 20}
        :render-fn               profile-card}]]))
@@ -128,67 +133,65 @@
          :as   multiaccount} (rf/sub [:multiaccounts/login])
         sign-in-enabled?     (rf/sub [:sign-in-enabled?])
         profile-picture      (:uri (first (:images multiaccount)))]
-    [rn/view
+    [rn/keyboard-avoiding-view
      {:style style/login-container}
-     [quo/button
-      {:size                32
-       :type                :blur-bg
-       :icon                true
-       :on-press            #(reset! show-profiles? true)
-       :override-theme      :dark
-       :width               32
-       :accessibility-label :show-profiles
-       :style               style/multi-profile-button}
-      :i/multi-profile]
-     [quo/profile-card
-      {:name                name
-       :customization-color (or customization-color :primary)
-       :profile-picture     (when profile-picture {:uri profile-picture})
-       :card-style          style/login-profile-card}]
-     [quo/input
-      {:type                :password
-       :blur?               true
-       :override-theme      :dark
-       :placeholder         (i18n/label :t/type-your-password)
-       :accessibility-label :password-input
-       :auto-focus          true
-       :error?              (when (not-empty error) error)
-       :label               (i18n/label :t/profile-password)
-       :secure-text-entry   true
-       :on-change-text      (fn [password]
-                              (rf/dispatch [:set-in [:multiaccounts/login :password]
-                                            (security/mask-data password)])
-                              (rf/dispatch [:set-in [:multiaccounts/login :error] ""]))
-       :on-submit-editing   (when sign-in-enabled? login-multiaccount)}]
-     (when (not-empty error)
-       [quo/info-message
-        {:type  :error
-         :size  :default
-         :icon  :i/info
-         :style style/info-message}
-        (i18n/label :t/ops-wrong-password)])
-     [rn/keyboard-avoiding-view
-      {:style    style/keyboard-avoiding-view
-       :behavior :height}
-      [rn/view {:flex 1}]
+     [rn/view
+      {:style {:flex 1}}
       [quo/button
-       {:size                40
-        :type                :ghost
-        :before              :i/info
-        :accessibility-label :forget-password-button
-        :override-theme      :dark}
-       (i18n/label :t/forget-password)]
-      [quo/button
-       {:size                40
-        :type                :primary
-        :customization-color (or :primary customization-color)
-        :accessibility-label :login-button
+       {:size                32
+        :type                :blur-bg
+        :icon                true
+        :on-press            #(reset! show-profiles? true)
         :override-theme      :dark
-        :before              :i/unlocked
-        :disabled            (or (not sign-in-enabled?) processing)
-        :on-press            login-multiaccount
-        :style               (style/login-button)}
-       (i18n/label :t/log-in)]]]))
+        :width               32
+        :accessibility-label :show-profiles
+        :style               style/multi-profile-button}
+       :i/multi-profile]
+      [quo/profile-card
+       {:name                name
+        :customization-color (or customization-color :primary)
+        :profile-picture     (when profile-picture {:uri profile-picture})
+        :card-style          style/login-profile-card}]
+      [quo/input
+       {:type                :password
+        :blur?               true
+        :override-theme      :dark
+        :placeholder         (i18n/label :t/type-your-password)
+        :accessibility-label :password-input
+        :auto-focus          true
+        :error?              (when (not-empty error) error)
+        :label               (i18n/label :t/profile-password)
+        :secure-text-entry   true
+        :on-change-text      (fn [password]
+                               (rf/dispatch [:set-in [:multiaccounts/login :password]
+                                             (security/mask-data password)])
+                               (rf/dispatch [:set-in [:multiaccounts/login :error] ""]))
+        :on-submit-editing   (when sign-in-enabled? login-multiaccount)}]
+      (when (not-empty error)
+        [quo/info-message
+         {:type  :error
+          :size  :default
+          :icon  :i/info
+          :style style/info-message}
+         (i18n/label :t/oops-wrong-password)])]
+     [quo/button
+      {:size                40
+       :type                :ghost
+       :before              :i/info
+       :accessibility-label :forget-password-button
+       :override-theme      :dark}
+      (i18n/label :t/forget-password)]
+     [quo/button
+      {:size                40
+       :type                :primary
+       :customization-color (or :primary customization-color)
+       :accessibility-label :login-button
+       :override-theme      :dark
+       :before              :i/unlocked
+       :disabled            (or (not sign-in-enabled?) processing)
+       :on-press            login-multiaccount
+       :style               (style/login-button)}
+      (i18n/label :t/log-in)]]))
 
 (defn views
   []
