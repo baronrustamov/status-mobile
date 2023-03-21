@@ -479,8 +479,8 @@
 (defn redirect-to-root
   "Decides which root should be initialised depending on user and app state"
   [db]
-  (let [tos-accepted?            (get db :tos/accepted?)
-        completed-local-pairing? (get db :local-pairing/completed-pairing?)]
+  (let [tos-accepted?            (:tos/accepted? db)
+        completed-local-pairing? (:local-pairing/completed-pairing? db)]
     (if tos-accepted?
       (if completed-local-pairing?
         (re-frame/dispatch [:syncing/pairing-completed])
